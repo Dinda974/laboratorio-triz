@@ -1,0 +1,1581 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio TRIZ · Distruzione Creativa</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blu:#1B3A6B; --blu2:#2A5298; --avorio:#F8F6F1;
+  --ambra:#C97D2E; --verde:#2D6A4F; --rosso:#C0392B;
+  --grigio:#6B7280; --gc:#E8E4DC; --bianco:#FFFFFF;
+  --ombra:0 4px 24px rgba(27,58,107,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans",sans-serif;background:var(--avorio);color:var(--blu);min-height:100vh}
+
+/* SCHERMATE */
+.screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--blu)}
+.screen.active{display:flex}
+
+/* LANDING */
+.join-logo{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.25em;color:var(--ambra);text-transform:uppercase;margin-bottom:1rem;text-align:center}
+.info-box{background:rgba(248,246,241,.08);border:1px solid rgba(248,246,241,.15);border-radius:12px;padding:1.1rem 1.4rem;max-width:360px;text-align:center;margin:1.25rem 0}
+.info-box .label{font-size:.75rem;font-weight:700;color:var(--ambra);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
+.info-box p{font-size:.88rem;color:rgba(248,246,241,.85);line-height:1.6}
+.cta-btn{background:var(--ambra);color:white;border:none;border-radius:10px;padding:.85rem 2rem;font-family:"IBM Plex Sans",sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
+.cta-btn:hover{background:#b56e25}
+
+/* SELEZIONE GRUPPO */
+.join-card{background:var(--avorio);border-radius:16px;padding:2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.join-card h2{font-size:.85rem;font-weight:600;color:var(--grigio);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
+.group-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem}
+.gbtn{padding:.75rem .5rem;border:2px solid var(--gc);border-radius:9px;background:var(--bianco);cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:.85rem;font-weight:600;color:var(--blu);transition:all .2s;text-align:center}
+.gbtn:hover{border-color:var(--blu2)}
+.gbtn.selected{border-color:var(--ambra);background:rgba(201,125,46,.08);color:var(--ambra)}
+.join-btn{width:100%;padding:.9rem;background:var(--blu);color:var(--avorio);border:none;border-radius:10px;font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .2s}
+.join-btn:hover{background:var(--blu2)}
+.join-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* HEADER */
+header{background:var(--blu);color:var(--avorio);padding:.7rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.hl{display:flex;align-items:center;gap:.75rem}
+.phase-ind{font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.2em;color:var(--ambra);text-transform:uppercase}
+.phase-nm{font-size:.9rem;font-weight:600;color:var(--avorio)}
+.group-badge{font-family:"IBM Plex Mono",monospace;font-size:.7rem;background:rgba(201,125,46,.25);color:var(--ambra);padding:.2rem .6rem;border-radius:6px}
+
+/* TIMER */
+.timer-wrap{display:flex;align-items:center;gap:.6rem}
+.timer-svg-wrap{position:relative;width:48px;height:48px;flex-shrink:0}
+.timer-svg-wrap svg{transform:rotate(-90deg)}
+.timer-track{fill:none;stroke:rgba(248,246,241,.15);stroke-width:4}
+.timer-fill{fill:none;stroke:var(--ambra);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.timer-fill.urgent{stroke:var(--rosso);animation:pr 1s ease-in-out infinite}
+@keyframes pr{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;color:var(--avorio)}
+.tctrls{display:flex;gap:.35rem}
+.tctrl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--avorio);border-radius:6px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
+.tctrl:hover{background:rgba(255,255,255,.2)}
+.conn-st{font-family:"IBM Plex Mono",monospace;font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:rgba(45,106,79,.2);color:#86efac}
+.conn-st.off{background:rgba(192,57,43,.2);color:#fca5a5}
+.kbtn{background:transparent;border:2px solid rgba(255,255,255,.3);color:var(--avorio);border-radius:8px;padding:.35rem .8rem;font-size:.82rem;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-weight:500;white-space:nowrap}
+.kbtn:hover{background:rgba(255,100,50,.3)}
+.kbtn.sent{background:var(--rosso);border-color:var(--rosso);animation:bounce .4s ease}
+@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
+
+/* FASI BAR */
+.phases-bar{background:var(--bianco);border-bottom:1px solid var(--gc);padding:0 1.25rem;display:flex;overflow-x:auto;scrollbar-width:none}
+.phases-bar::-webkit-scrollbar{display:none}
+.ptab{padding:.65rem 1.1rem;font-size:.78rem;font-weight:500;color:var(--grigio);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:600}
+.ptab.done{color:var(--verde)}
+.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.62rem;color:var(--grigio);display:block}
+
+/* MAIN */
+main{flex:1;padding:1.25rem;max-width:780px;margin:0 auto;width:100%}
+
+/* CARDS */
+.card{background:var(--bianco);border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--ombra);border-left:4px solid var(--blu)}
+.card.ambra{border-left-color:var(--ambra)}
+.card.verde{border-left-color:var(--verde)}
+.card.rosso{border-left-color:var(--rosso)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grigio);margin-bottom:.6rem}
+.ctitle{font-size:1.05rem;font-weight:700;color:var(--blu);margin-bottom:.65rem;line-height:1.3}
+.cbody{font-size:.875rem;line-height:1.7;color:#374151}
+
+/* DOMANDA PROVOCATORIA */
+.provocazione{background:rgba(192,57,43,.06);border:2px solid rgba(192,57,43,.2);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
+.provocazione .emoji{font-size:2rem;margin-bottom:.5rem;display:block}
+.provocazione p{font-size:1rem;font-weight:600;color:var(--rosso);line-height:1.5}
+
+/* TEXTAREA */
+.answer-area{width:100%;min-height:120px;border:2px solid var(--gc);border-radius:8px;padding:.75rem;font-family:"IBM Plex Sans",sans-serif;font-size:.875rem;color:var(--blu);background:var(--avorio);resize:vertical;transition:border-color .2s;margin-top:.75rem;line-height:1.6}
+.answer-area:focus{outline:none;border-color:var(--ambra)}
+.answer-area:read-only{background:rgba(27,58,107,.03);color:var(--grigio);cursor:default}
+.save-btn{margin-top:.5rem;padding:.5rem 1.1rem;background:var(--blu);color:var(--avorio);border:none;border-radius:7px;font-family:"IBM Plex Sans",sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .2s}
+.save-btn:hover{background:var(--blu2)}
+.save-btn:disabled{opacity:.4;cursor:not-allowed}
+.saved-ok{font-size:.75rem;color:var(--verde);font-weight:600;margin-left:.5rem;display:inline-block;opacity:0;transition:opacity .3s}
+
+/* FAC PANEL */
+.fac-panel{background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.12);border-radius:10px;padding:1.1rem;margin-bottom:1rem}
+.fac-panel h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--grigio);font-family:"IBM Plex Mono",monospace;margin-bottom:.85rem}
+.nav-btns{display:flex;gap:.6rem;flex-wrap:wrap}
+.nbtn{padding:.5rem 1rem;border-radius:7px;border:2px solid var(--blu);background:transparent;color:var(--blu);font-family:"IBM Plex Sans",sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
+.nbtn:hover{background:var(--blu);color:var(--avorio)}
+.nbtn.pri{background:var(--blu);color:var(--avorio)}
+.nbtn.pri:hover{background:var(--blu2)}
+.nbtn.danger{border-color:var(--rosso);color:var(--rosso)}
+.nbtn.danger:hover{background:var(--rosso);color:white}
+
+/* RISPOSTE FAC */
+.fac-answers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;margin-top:.75rem}
+.fanswer{background:var(--bianco);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--gc);font-size:.82rem;line-height:1.5;color:#374151}
+.fanswer .frole{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--grigio);margin-bottom:.3rem}
+.fanswer.empty{color:var(--grigio);font-style:italic}
+
+/* FASE 3 VOTO ELIMINAZIONE */
+.elimina-list{list-style:none;margin-top:.75rem}
+.elimina-item{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem;border:2px solid var(--gc);border-radius:9px;margin-bottom:.5rem;background:var(--bianco);cursor:pointer;transition:all .2s}
+.elimina-item:hover{border-color:var(--rosso)}
+.elimina-item.voted{border-color:var(--rosso);background:rgba(192,57,43,.05)}
+.elimina-item .check{width:20px;height:20px;border:2px solid var(--gc);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s}
+.elimina-item.voted .check{background:var(--rosso);border-color:var(--rosso);color:white}
+.elimina-item .text{font-size:.875rem;line-height:1.5;color:#374151}
+.elimina-item .votes{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--rosso);font-weight:600;margin-left:auto;flex-shrink:0}
+
+/* CANGURO */
+.canguro-alerts{position:fixed;bottom:1.25rem;right:1.25rem;z-index:200;display:flex;flex-direction:column;gap:.4rem;max-width:260px}
+.ca{background:var(--rosso);color:white;padding:.65rem .9rem;border-radius:9px;font-size:.82rem;font-weight:500;box-shadow:0 4px 16px rgba(192,57,43,.4);animation:si .3s ease}
+@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+.kclear{position:fixed;bottom:1.25rem;left:1.25rem;z-index:201;display:none}
+.kclear button{background:var(--blu);color:white;border:none;border-radius:7px;padding:.45rem .9rem;font-family:"IBM Plex Sans",sans-serif;font-size:.78rem;font-weight:600;cursor:pointer}
+.kcount{display:inline-flex;align-items:center;background:var(--rosso);color:white;padding:.15rem .5rem;border-radius:12px;font-size:.75rem;font-weight:700;margin-left:.35rem}
+
+/* PROIETTORE */
+#screen-proj{min-height:100vh;background:var(--blu);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;position:relative}
+.proj-phase{font-family:"IBM Plex Mono",monospace;font-size:.9rem;letter-spacing:.3em;color:var(--ambra);text-transform:uppercase;margin-bottom:.4rem}
+.proj-title{font-size:clamp(1.6rem,4vw,2.8rem);font-weight:700;color:var(--avorio);margin-bottom:1.5rem;line-height:1.2;max-width:700px}
+.proj-timer{font-family:"IBM Plex Mono",monospace;font-size:clamp(3rem,10vw,7rem);font-weight:600;color:var(--avorio);margin-bottom:.5rem}
+.proj-timer.urgent{color:var(--rosso);animation:pr 1s ease-in-out infinite}
+.proj-sub{font-size:1rem;color:rgba(248,246,241,.5);margin-bottom:2rem}
+.proj-answers{width:100%;max-width:800px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin-top:1.5rem;display:none}
+.proj-answer-card{background:rgba(248,246,241,.07);border-radius:10px;padding:.85rem 1rem;text-align:left}
+.proj-answer-group{font-family:"IBM Plex Mono",monospace;font-size:.65rem;color:var(--ambra);margin-bottom:.35rem;letter-spacing:.1em}
+.proj-answer-text{font-size:.82rem;color:rgba(248,246,241,.85);line-height:1.5}
+.proj-elimina{width:100%;max-width:600px;margin-top:1.5rem;display:none}
+.proj-el-item{background:rgba(248,246,241,.07);border-radius:9px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center}
+.proj-el-text{font-size:.9rem;color:var(--avorio);text-align:left;line-height:1.4}
+.proj-el-votes{font-family:"IBM Plex Mono",monospace;font-size:1.1rem;font-weight:700;color:var(--rosso)}
+
+/* REPORT */
+.report-btn{display:block;width:100%;padding:1rem;background:var(--verde);color:white;border:none;border-radius:10px;font-family:"IBM Plex Sans",sans-serif;font-size:1rem;font-weight:600;cursor:pointer;margin-top:1rem;transition:background .2s;text-align:center}
+.report-btn:hover{background:#1e4d38}
+
+/* FOOTER */
+footer{text-align:center;padding:1.25rem;font-size:.72rem;color:var(--grigio);border-top:1px solid var(--gc);font-family:"IBM Plex Mono",monospace;letter-spacing:.05em}
+
+@media(max-width:600px){
+  .phase-nm{display:none}
+  main{padding:.9rem}
+  .tctrls{display:none}
+  .group-grid{grid-template-columns:repeat(4,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="screen-landing" class="screen active">
+  <div class="join-logo">Laboratorio · TRIZ · 2026</div>
+  <div style="margin-bottom:1.25rem;display:flex;flex-direction:column;align-items:center;gap:.5rem">
+    <div style="background:rgba(248,246,241,.08);border-radius:10px;padding:7px"><svg width="205" height="205" viewBox="0 0 205 205" xmlns="http://www.w3.org/2000/svg" style="display:block"><rect width="205" height="205" fill="#1B3A6B" rx="8"/><rect x="10" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="10" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="15" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="20" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="25" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="30" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="35" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="40" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="45" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="50" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="55" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="60" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="65" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="70" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="75" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="80" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="85" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="90" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="95" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="100" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="105" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="110" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="115" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="120" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="125" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="130" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="135" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="140" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="145" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="45" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="150" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="155" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="120" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="160" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="175" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="165" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="170" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="50" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="75" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="175" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="55" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="125" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="135" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="165" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="180" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="60" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="70" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="115" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="130" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="140" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="170" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="180" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="185" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="185" width="5" height="5" fill="#F8F6F1"/>
+<rect x="10" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="15" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="20" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="25" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="30" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="35" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="40" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="65" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="80" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="85" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="90" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="95" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="100" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="105" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="110" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="145" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="150" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="155" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="160" y="190" width="5" height="5" fill="#F8F6F1"/>
+<rect x="190" y="190" width="5" height="5" fill="#F8F6F1"/></svg></div>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:rgba(248,246,241,.35)">Scansiona per accedere</span>
+  </div>
+  <div class="info-box">
+    <div class="label">Modalità gruppi</div>
+    <p>Riunitevi in gruppi di <strong style="color:var(--avorio)">8-10 persone</strong> e usate un solo device per gruppo. Decidete insieme.</p>
+  </div>
+  <button class="cta-btn" onclick="showGroupScreen()">Seleziona il tuo gruppo →</button>
+  <div style="margin-top:1.5rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:rgba(248,246,241,.25)">© 2026 Adriana Augenti</div>
+</div>
+
+<!-- SELEZIONE GRUPPO -->
+<div id="screen-join" class="screen">
+  <div class="join-card">
+    <h2>Seleziona il tuo gruppo</h2>
+    <div class="group-grid">
+      <button class="gbtn" onclick="selectGroup(1)">Gruppo 1</button>
+      <button class="gbtn" onclick="selectGroup(2)">Gruppo 2</button>
+      <button class="gbtn" onclick="selectGroup(3)">Gruppo 3</button>
+      <button class="gbtn" onclick="selectGroup(4)">Gruppo 4</button>
+      <button class="gbtn" onclick="selectGroup(5)">Gruppo 5</button>
+      <button class="gbtn" onclick="selectGroup(6)">Gruppo 6</button>
+      <button class="gbtn" onclick="selectGroup(7)">Gruppo 7</button>
+      <button class="gbtn" onclick="selectGroup(8)">Gruppo 8</button>
+    </div>
+    <button class="join-btn" id="join-btn" disabled onclick="joinSession()">Entra nel laboratorio →</button>
+  </div>
+</div>
+
+<!-- PROIETTORE -->
+<div id="screen-proj">
+  <div class="proj-phase" id="proj-phase-label">FASE 1</div>
+  <div class="proj-title" id="proj-phase-title">La Progettazione del Disastro</div>
+  <div class="proj-timer" id="proj-timer">10:00</div>
+  <div class="proj-sub" id="proj-sub">Ogni gruppo sta costruendo il peggior sistema AI possibile</div>
+  <div class="proj-answers" id="proj-answers"></div>
+  <div class="proj-elimina" id="proj-elimina"></div>
+  <div style="position:absolute;bottom:1rem;right:1.5rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:rgba(248,246,241,.25)">© 2026 Adriana Augenti</div>
+</div>
+
+<!-- MAIN APP -->
+<div id="screen-main" style="display:none;min-height:100vh;flex-direction:column">
+  <header>
+    <div class="hl">
+      <div>
+        <div class="phase-ind" id="header-phase-num">FASE 1</div>
+        <div class="phase-nm" id="header-phase-name">La Progettazione del Disastro</div>
+      </div>
+      <span class="group-badge" id="group-badge">Gruppo —</span>
+    </div>
+    <div class="timer-wrap">
+      <div class="timer-svg-wrap">
+        <svg width="48" height="48" viewBox="0 0 48 48">
+          <circle class="timer-track" cx="24" cy="24" r="20"/>
+          <circle class="timer-fill" id="timer-circle" cx="24" cy="24" r="20"
+            stroke-dasharray="125.66" stroke-dashoffset="0"/>
+        </svg>
+        <div class="timer-text" id="timer-display">10:00</div>
+      </div>
+      <div class="tctrls" id="tctrls" style="display:none">
+        <button class="tctrl" id="tctrl-pause" onclick="timerToggle()">⏸</button>
+        <button class="tctrl" onclick="timerReset()">↺</button>
+      </div>
+      <span class="conn-st" id="conn-st">●</span>
+    </div>
+    <button class="kbtn" id="kbtn" onclick="sendKangaro()">🦘</button>
+  </header>
+
+  <div class="phases-bar">
+    <div class="ptab active" data-phase="0">Fase 1 · Disastro <span class="tt">10 min</span></div>
+    <div class="ptab" data-phase="1">Fase 2 · Verità <span class="tt">10 min</span></div>
+    <div class="ptab" data-phase="2">Fase 3 · Abbandono <span class="tt">10 min</span></div>
+  </div>
+
+  <main id="main-content"></main>
+  <footer>© 2026 Adriana Augenti · Tutti i diritti riservati</footer>
+</div>
+
+<div class="canguro-alerts" id="canguro-alerts"></div>
+<div class="kclear" id="kclear"><button onclick="clearKangaro()">✓ Azzera 🦘</button></div>
+
+<script>
+// Coda onclick — le funzioni vengono registrate dal modulo Firebase
+window._fns = {};
+window._queue = [];
+window.showGroupScreen = function() {
+  document.getElementById("screen-landing").classList.remove("active");
+  document.getElementById("screen-join").classList.add("active");
+};
+["selectGroup","joinSession","goToPhase","timerToggle","timerReset",
+ "sendKangaro","clearKangaro","saveAnswer","submitElimina",
+ "resetSessione","downloadReport"].forEach(function(fn) {
+  window[fn] = function() {
+    var args = Array.prototype.slice.call(arguments);
+    if (window._fns[fn]) return window._fns[fn].apply(null, args);
+    window._queue.push([fn, args]);
+  };
+});
+window._ready = function(fns) {
+  Object.assign(window._fns, fns);
+  window._queue.forEach(function(item) {
+    if (fns[item[0]]) fns[item[0]].apply(null, item[1]);
+  });
+  window._queue = [];
+};
+</script>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getDatabase, ref, set, get, onValue, push, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvXY6G8i6Tal_o-ex596yCsqEWVSjPHfE",
+  authDomain: "laboratorio-triz.firebaseapp.com",
+  databaseURL: "https://laboratorio-triz-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "laboratorio-triz",
+  storageBucket: "laboratorio-triz.firebasestorage.app",
+  messagingSenderId: "841878394031",
+  appId: "1:841878394031:web:eb2b81732fc229070ff05a"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+// STATO
+let myGroup = null;
+let isFacilitatore = false;
+let isProiettore = false;
+let currentPhase = 0;
+let timerInterval = null;
+let myAnswers = {};
+let myElimina = {};
+
+const PHASE_DUR = [600, 600, 600];
+const PHASE_NAMES = [
+  "La Progettazione del Disastro",
+  "Il Momento della Verita",
+  "La Distruzione Creativa"
+];
+const PHASE_SUBS = [
+  "Ogni gruppo sta costruendo il peggior sistema AI possibile",
+  "Cosa di questo somiglia alla nostra realta lavorativa?",
+  "Cosa dobbiamo smettere di fare subito?"
+];
+const CIRC = 2 * Math.PI * 20;
+
+// URL PARAMS
+const params = new URLSearchParams(window.location.search);
+if (params.get("facilitatore") === "AA2026") {
+  isFacilitatore = true;
+  myGroup = "facilitatore";
+  startApp();
+} else if (params.get("proiettore") === "true") {
+  isProiettore = true;
+  startProjector();
+}
+
+// SELEZIONE GRUPPO
+window.selectGroup = function(n) {
+  myGroup = "gruppo" + n;
+  document.querySelectorAll(".gbtn").forEach(function(b) { b.classList.remove("selected"); });
+  document.querySelectorAll(".gbtn")[n-1].classList.add("selected");
+  document.getElementById("join-btn").disabled = false;
+};
+
+window.joinSession = async function() {
+  if (!myGroup) return;
+  const rr = ref(db, "presenze/" + myGroup);
+  const snap = await get(rr);
+  await set(rr, (snap.val() || 0) + 1);
+  startApp();
+};
+
+function startApp() {
+  document.getElementById("screen-landing").classList.remove("active");
+  document.getElementById("screen-join").classList.remove("active");
+  document.getElementById("screen-main").style.display = "flex";
+  document.getElementById("screen-main").style.flexDirection = "column";
+  const label = myGroup === "facilitatore" ? "Facilitatore" :
+    "Gruppo " + myGroup.replace("gruppo","");
+  document.getElementById("group-badge").textContent = label;
+  if (isFacilitatore) {
+    document.getElementById("tctrls").style.display = "flex";
+    document.getElementById("kbtn").style.display = "none";
+  }
+  listenToSession();
+  listenToKangaro();
+  if (isFacilitatore) listenToAllAnswers();
+}
+
+// PROIETTORE
+function startProjector() {
+  document.getElementById("screen-proj").style.display = "flex";
+  listenToSessionProjector();
+}
+
+let projInterval = null;
+function listenToSessionProjector() {
+  onValue(ref(db, "session"), function(snap) {
+    const data = snap.val();
+    if (!data) return;
+    const phase = data.phase || 0;
+    document.getElementById("proj-phase-label").textContent = "FASE " + (phase+1);
+    document.getElementById("proj-phase-title").textContent = PHASE_NAMES[phase];
+    document.getElementById("proj-sub").textContent = PHASE_SUBS[phase];
+    if (data.timerEnd && data.timerTotal) {
+      syncProjTimer(data.timerEnd, data.timerTotal, data.timerPaused, data.timerPausedAt, phase);
+    }
+    // Fase 2: mostra risposte fase 1
+    if (phase >= 1) showProjAnswers("f1");
+    // Fase 3: mostra classifica eliminazioni
+    if (phase >= 2) showProjElimina();
+  });
+}
+
+function syncProjTimer(timerEnd, timerTotal, paused, pausedAt, phase) {
+  clearInterval(projInterval);
+  const el = document.getElementById("proj-timer");
+  function update() {
+    let rem;
+    if (paused && pausedAt) rem = Math.max(0, Math.round((timerEnd - pausedAt)/1000));
+    else rem = Math.max(0, Math.round((timerEnd - Date.now())/1000));
+    const m = Math.floor(rem/60), s = rem%60;
+    el.textContent = m + ":" + (s < 10 ? "0" : "") + s;
+    el.className = "proj-timer" + (rem <= 60 && rem > 0 ? " urgent" : "");
+  }
+  update();
+  if (!paused) projInterval = setInterval(update, 500);
+}
+
+function showProjAnswers(qid) {
+  const container = document.getElementById("proj-answers");
+  container.style.display = "grid";
+  onValue(ref(db, "answers/" + qid), function(snap) {
+    const data = snap.val() || {};
+    container.innerHTML = "";
+    for (let i = 1; i <= 8; i++) {
+      const gkey = "gruppo" + i;
+      const ans = data[gkey];
+      if (ans && ans.text) {
+        container.innerHTML += '<div class="proj-answer-card">' +
+          '<div class="proj-answer-group">GRUPPO ' + i + '</div>' +
+          '<div class="proj-answer-text">' + ans.text.substring(0,200) + (ans.text.length > 200 ? "..." : "") + '</div>' +
+          '</div>';
+      }
+    }
+  });
+}
+
+function showProjElimina() {
+  const container = document.getElementById("proj-elimina");
+  container.style.display = "block";
+  onValue(ref(db, "elimina_votes"), function(snap) {
+    const data = snap.val() || {};
+    const items = [];
+    Object.entries(data).forEach(function(entry) {
+      const key = entry[0], val = entry[1];
+      if (val && val.text) {
+        let total = 0;
+        if (val.votes) Object.values(val.votes).forEach(function(v) { total += v; });
+        items.push({ text: val.text, votes: total, group: val.group });
+      }
+    });
+    items.sort(function(a,b) { return b.votes - a.votes; });
+    container.innerHTML = '<div style="font-family:IBM Plex Mono,monospace;font-size:.8rem;letter-spacing:.15em;color:var(--ambra);margin-bottom:.75rem">DA ELIMINARE SUBITO</div>';
+    items.slice(0,8).forEach(function(item) {
+      container.innerHTML += '<div class="proj-el-item">' +
+        '<span class="proj-el-text">' + item.text + '</span>' +
+        '<span class="proj-el-votes">' + item.votes + ' voti</span>' +
+        '</div>';
+    });
+  });
+}
+
+// SESSION
+function listenToSession() {
+  onValue(ref(db, "session"), function(snap) {
+    const data = snap.val();
+    const el = document.getElementById("conn-st");
+    el.className = "conn-st";
+    el.textContent = "●";
+    if (!data) { if (isFacilitatore) initSession(); return; }
+    if (data.phase !== undefined && data.phase !== currentPhase) {
+      currentPhase = data.phase;
+      renderPhase(currentPhase);
+      window.scrollTo({top:0, behavior:"smooth"});
+    }
+    if (data.timerEnd && data.timerTotal) {
+      syncTimer(data.timerEnd, data.timerTotal, data.timerPaused||false, data.timerPausedAt||null);
+    }
+  }, function() {
+    document.getElementById("conn-st").className = "conn-st off";
+  });
+}
+
+async function initSession() {
+  const dur = PHASE_DUR[0];
+  const timerEnd = Date.now() + dur*1000;
+  await set(ref(db, "session"), {
+    phase:0, timerEnd:timerEnd, timerTotal:dur,
+    timerPaused:false, timerPausedAt:null,
+    startedAt: serverTimestamp()
+  });
+  renderPhase(0);
+  syncTimer(timerEnd, dur, false, null);
+}
+
+window.goToPhase = async function(phase) {
+  if (!isFacilitatore) return;
+  currentPhase = phase;
+  const dur = PHASE_DUR[phase];
+  const timerEnd = Date.now() + dur*1000;
+  await set(ref(db, "session"), {
+    phase:phase, timerEnd:timerEnd, timerTotal:dur,
+    timerPaused:false, timerPausedAt:null
+  });
+  renderPhase(phase);
+  window.scrollTo({top:0, behavior:"smooth"});
+  syncTimer(timerEnd, dur, false, null);
+};
+
+// TIMER
+function syncTimer(timerEnd, timerTotal, paused, pausedAt) {
+  clearInterval(timerInterval);
+  function update() {
+    let rem;
+    if (paused && pausedAt) rem = Math.max(0, Math.round((timerEnd-pausedAt)/1000));
+    else rem = Math.max(0, Math.round((timerEnd-Date.now())/1000));
+    const m = Math.floor(rem/60), s = rem%60;
+    document.getElementById("timer-display").textContent = m + ":" + (s<10?"0":"") + s;
+    const offset = CIRC * (1 - rem/timerTotal);
+    const el = document.getElementById("timer-circle");
+    el.style.strokeDashoffset = offset;
+    el.className = "timer-fill" + (rem<=60&&rem>0?" urgent":"");
+  }
+  update();
+  if (!paused) timerInterval = setInterval(update, 500);
+}
+
+window.timerToggle = async function() {
+  if (!isFacilitatore) return;
+  const snap = await get(ref(db, "session"));
+  const data = snap.val() || {};
+  const isPaused = data.timerPaused || false;
+  if (isPaused) {
+    const rem = Math.max(0, Math.round((data.timerEnd-(data.timerPausedAt||Date.now()))/1000));
+    const newEnd = Date.now() + rem*1000;
+    await set(ref(db, "session/timerPaused"), false);
+    await set(ref(db, "session/timerPausedAt"), null);
+    await set(ref(db, "session/timerEnd"), newEnd);
+  } else {
+    await set(ref(db, "session/timerPaused"), true);
+    await set(ref(db, "session/timerPausedAt"), Date.now());
+  }
+  document.getElementById("tctrl-pause").textContent = isPaused ? "⏸" : "▶";
+};
+
+window.timerReset = async function() {
+  if (!isFacilitatore) return;
+  const dur = PHASE_DUR[currentPhase];
+  const timerEnd = Date.now() + dur*1000;
+  await set(ref(db, "session/timerEnd"), timerEnd);
+  await set(ref(db, "session/timerTotal"), dur);
+  await set(ref(db, "session/timerPaused"), false);
+  await set(ref(db, "session/timerPausedAt"), null);
+};
+
+// RISPOSTE
+window.saveAnswer = async function(qid) {
+  const ta = document.getElementById("ta-"+qid);
+  if (!ta || !myGroup) return;
+  const text = ta.value.trim();
+  if (!text) return;
+  await set(ref(db, "answers/"+qid+"/"+myGroup), { text:text, group:myGroup, ts:Date.now() });
+  myAnswers[qid] = text;
+  ta.readOnly = true;
+  const btn = document.querySelector("[data-save='"+qid+"']");
+  if (btn) btn.disabled = true;
+  const ok = document.getElementById("saved-"+qid);
+  if (ok) { ok.style.opacity="1"; setTimeout(function(){ok.style.opacity="0";},2000); }
+};
+
+function listenToAllAnswers() {
+  ["f1","f2"].forEach(function(qid) {
+    onValue(ref(db, "answers/"+qid), function(snap) {
+      const data = snap.val() || {};
+      const container = document.getElementById("fac-ans-"+qid);
+      if (!container) return;
+      container.innerHTML = "";
+      let found = false;
+      for (let i=1;i<=8;i++) {
+        const g = "gruppo"+i;
+        if (data[g] && data[g].text) {
+          found = true;
+          container.innerHTML += '<div class="fanswer">' +
+            '<div class="frole">Gruppo '+i+'</div>' + data[g].text + '</div>';
+        }
+      }
+      if (!found) container.innerHTML = '<div class="fanswer empty">Nessuna risposta ancora</div>';
+    });
+  });
+}
+
+// FASE 3: VOTO ELIMINAZIONE
+window.submitElimina = async function() {
+  if (!myGroup) return;
+  const ta = document.getElementById("ta-f3");
+  if (!ta) return;
+  const text = ta.value.trim();
+  if (!text) return;
+  const key = myGroup;
+  await set(ref(db, "elimina_votes/"+key), {
+    text:text, group:myGroup, votes:{}, ts:Date.now()
+  });
+  ta.readOnly = true;
+  const btn = document.getElementById("btn-f3");
+  if (btn) btn.disabled = true;
+  const ok = document.getElementById("saved-f3");
+  if (ok) { ok.style.opacity="1"; setTimeout(function(){ok.style.opacity="0";},2000); }
+  listenToElimina();
+};
+
+window.voteElimina = async function(key) {
+  if (myElimina[key]) return;
+  myElimina[key] = true;
+  const vr = ref(db, "elimina_votes/"+key+"/votes/"+myGroup);
+  const snap = await get(vr);
+  await set(vr, (snap.val()||0)+1);
+  listenToElimina();
+};
+
+function listenToElimina() {
+  onValue(ref(db, "elimina_votes"), function(snap) {
+    const data = snap.val() || {};
+    const container = document.getElementById("elimina-container");
+    if (!container) return;
+    const items = [];
+    Object.entries(data).forEach(function(entry) {
+      const key = entry[0], val = entry[1];
+      if (val && val.text) {
+        let total = 0;
+        if (val.votes) Object.values(val.votes).forEach(function(v){total+=v;});
+        items.push({key:key, text:val.text, votes:total});
+      }
+    });
+    items.sort(function(a,b){return b.votes-a.votes;});
+    container.innerHTML = "";
+    items.forEach(function(item) {
+      const voted = !!myElimina[item.key];
+      container.innerHTML += '<li class="elimina-item'+(voted?" voted":"")+
+        '" onclick="window.voteElimina(\''+item.key+'\')">' +
+        '<span class="check">'+(voted?"✓":"")+"</span>" +
+        '<span class="text">'+item.text+"</span>" +
+        '<span class="votes">'+item.votes+" voti</span>" +
+        "</li>";
+    });
+    if (items.length === 0) {
+      container.innerHTML = '<li style="padding:.75rem;color:var(--grigio);font-size:.85rem;font-style:italic">I comportamenti da eliminare appariranno qui man mano che i gruppi li inseriscono</li>';
+    }
+  });
+}
+
+// KANGARO
+function listenToKangaro() {
+  onValue(ref(db, "kangaro"), function(snap) {
+    if (!isFacilitatore) return;
+    const data = snap.val();
+    const alertsEl = document.getElementById("canguro-alerts");
+    alertsEl.innerHTML = "";
+    if (!data) { document.getElementById("kclear").style.display="none"; return; }
+    const items = Object.values(data)
+      .filter(function(k){return k&&k.ts&&(Date.now()-k.ts<180000);})
+      .sort(function(a,b){return b.ts-a.ts;})
+      .slice(0,5);
+    items.forEach(function(k) {
+      const el = document.createElement("div");
+      el.className = "ca";
+      el.textContent = "🦘 " + k.group + " ha bisogno di aiuto!";
+      alertsEl.appendChild(el);
+    });
+    if (items.length > 0) {
+      document.getElementById("kclear").style.display = "block";
+    } else {
+      document.getElementById("kclear").style.display = "none";
+    }
+  });
+}
+
+window.sendKangaro = async function() {
+  if (isFacilitatore) return;
+  const btn = document.getElementById("kbtn");
+  btn.classList.add("sent");
+  setTimeout(function(){btn.classList.remove("sent");}, 2000);
+  const label = "Gruppo " + myGroup.replace("gruppo","");
+  await push(ref(db, "kangaro"), {group:label, ts:Date.now()});
+};
+
+window.clearKangaro = async function() {
+  await set(ref(db, "kangaro"), null);
+  document.getElementById("canguro-alerts").innerHTML = "";
+  document.getElementById("kclear").style.display = "none";
+};
+
+// RESET
+window.resetSessione = async function() {
+  if (!confirm("Azzerare tutta la sessione?")) return;
+  await set(ref(db, "session"), null);
+  await set(ref(db, "kangaro"), null);
+  await set(ref(db, "presenze"), null);
+  await set(ref(db, "answers"), null);
+  await set(ref(db, "elimina_votes"), null);
+  location.reload();
+};
+
+// REPORT
+window.downloadReport = async function() {
+  const snap = await get(ref(db, "/"));
+  const all = snap.val() || {};
+  let txt = "═══════════════════════════════════════\n";
+  txt += "REPORT LABORATORIO TRIZ\n";
+  txt += "Distruzione Creativa e AI nella PA\n";
+  txt += "Generato il " + new Date().toLocaleString("it-IT") + "\n";
+  txt += "© 2026 Adriana Augenti\n";
+  txt += "═══════════════════════════════════════\n\n";
+
+  txt += "── PRESENZE PER GRUPPO ──\n";
+  const p = all.presenze || {};
+  for (let i=1;i<=8;i++) {
+    txt += "Gruppo "+i+": "+(p["gruppo"+i]||0)+" accessi\n";
+  }
+  txt += "\n";
+
+  txt += "── FASE 1: IL DISASTRO PROGETTATO ──\n\n";
+  const f1 = (all.answers||{}).f1 || {};
+  for (let i=1;i<=8;i++) {
+    const ans = f1["gruppo"+i];
+    if (ans && ans.text) txt += "Gruppo "+i+":\n"+ans.text+"\n\n";
+  }
+
+  txt += "── FASE 2: COSA FACCIAMO GIA OGGI ──\n\n";
+  const f2 = (all.answers||{}).f2 || {};
+  for (let i=1;i<=8;i++) {
+    const ans = f2["gruppo"+i];
+    if (ans && ans.text) txt += "Gruppo "+i+":\n"+ans.text+"\n\n";
+  }
+
+  txt += "── FASE 3: DA ELIMINARE SUBITO (per voti) ──\n\n";
+  const ev = all.elimina_votes || {};
+  const items = [];
+  Object.values(ev).forEach(function(val) {
+    if (val && val.text) {
+      let total = 0;
+      if (val.votes) Object.values(val.votes).forEach(function(v){total+=v;});
+      items.push({text:val.text, votes:total, group:val.group});
+    }
+  });
+  items.sort(function(a,b){return b.votes-a.votes;});
+  items.forEach(function(item,i) {
+    txt += (i+1)+". ["+item.votes+" voti] "+item.text+"\n";
+  });
+
+  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = "report-triz.txt"; a.click();
+  URL.revokeObjectURL(url);
+};
+
+// RENDER
+function renderPhase(phase) {
+  window.scrollTo({top:0, behavior:"smooth"});
+  document.getElementById("header-phase-num").textContent = "FASE "+(phase+1);
+  document.getElementById("header-phase-name").textContent = PHASE_NAMES[phase];
+  document.querySelectorAll(".ptab").forEach(function(t,i) {
+    t.className = "ptab"+(i===phase?" active":i<phase?" done":"");
+  });
+  const main = document.getElementById("main-content");
+  if (phase===0) main.innerHTML = renderF1();
+  else if (phase===1) main.innerHTML = renderF2();
+  else main.innerHTML = renderF3();
+  if (isFacilitatore) listenToAllAnswers();
+  if (phase===2) listenToElimina();
+}
+
+function facPanel(prev, next, prevLabel, nextLabel) {
+  const qid = prev === null ? "f1" : (prev === 0 ? "f2" : "f3");
+  return '<div class="fac-panel">' +
+    '<h3>🎛 Pannello Facilitatore · Adriana Augenti</h3>' +
+    '<div class="nav-btns">' +
+    (prev!==null?'<button class="nbtn" onclick="goToPhase('+prev+')">← '+prevLabel+'</button>':'') +
+    (next!==null?'<button class="nbtn pri" onclick="goToPhase('+next+')">→ '+nextLabel+'</button>':'') +
+    '<button class="nbtn" onclick="timerReset()">↺ Riavvia timer</button>' +
+    (next===null?'<button class="nbtn danger" onclick="resetSessione()">⚠ Reset sessione</button>':'') +
+    '</div>' +
+    (next===null?'<button class="report-btn" style="width:100%;margin-top:.75rem" onclick="downloadReport()">⬇ Scarica report (TXT)</button>':'') +
+    '</div>';
+}
+
+function mkAnswer(qid, placeholder, saveFn) {
+  const saved = myAnswers[qid];
+  const saveHandler = saveFn ? `${saveFn}('${qid}')` : `saveAnswer('${qid}')`;
+  return '<textarea id="ta-'+qid+'" class="answer-area" placeholder="'+placeholder+'"' +
+    (saved?' readonly>'+saved:'>')+
+    '</textarea>' +
+    (!saved ? '<div style="margin-top:.5rem">' +
+      '<button class="save-btn" data-save="'+qid+'" onclick="'+saveHandler+'">Salva risposta</button>' +
+      '<span class="saved-ok" id="saved-'+qid+'">✓ Salvata</span></div>'
+      : '<p style="font-size:.75rem;color:var(--verde);margin-top:.35rem">✓ Risposta salvata</p>');
+}
+
+function renderF1() {
+  const fp = isFacilitatore ? facPanel(null, 1, "", "Fase 2: Momento della Verita") : "";
+  const facAns = isFacilitatore ?
+    '<div class="fac-panel" style="margin-top:1rem"><h3>Risposte in tempo reale</h3><div class="fac-answers-grid" id="fac-ans-f1"></div></div>' : "";
+  return fp +
+    '<div class="card rosso">' +
+    '<div class="eyebrow">Fase 1 · La Progettazione del Disastro</div>' +
+    '<h2 class="ctitle">Come progettiamo il peggior sistema AI possibile?</h2>' +
+    '<div class="cbody">Siete una task force incaricata di creare un sistema di intelligenza artificiale catastrofico per il vostro ente. Non ci sono limiti alla vostra creativita distruttiva.</div>' +
+    '</div>' +
+    '<div class="provocazione">' +
+    '<span class="emoji">💣</span>' +
+    "<p>\"Come possiamo usare l\'intelligenza artificiale per discriminare i docenti, violare palesemente la privacy e farci sanzionare pesantemente dal Garante o dall\'AgID?\"</p>" +
+    '</div>' +
+    '<div class="card ambra">' +
+    '<div class="eyebrow">Il vostro compito</div>' +
+    "<div class='cbody'>Elencate tutte le azioni e gli errori necessari per creare questo disastro. Siate spietati e creativi. Esempi per iniziare: inserire documenti riservati su ChatGPT, non controllare mai i documenti generati da strumenti AI, automatizzare decisioni senza supervisione umana...</div>" +
+    mkAnswer("f1", "Elencate qui tutte le azioni distruttive del vostro gruppo: piu siete creativi e spietati, meglio e...") +
+    '</div>' +
+    facAns;
+}
+
+function renderF2() {
+  const fp = isFacilitatore ? facPanel(0, 2, "Fase 1: Disastro", "Fase 3: Abbandono") : "";
+  const facAns = isFacilitatore ?
+    '<div class="fac-panel" style="margin-top:1rem"><h3>Risposte in tempo reale</h3><div class="fac-answers-grid" id="fac-ans-f2"></div></div>' : "";
+  return fp +
+    '<div class="card verde">' +
+    '<div class="eyebrow">Fase 2 · Il Momento della Verita</div>' +
+    '<h2 class="ctitle">Cosa di questo somiglia alla nostra realta lavorativa?</h2>' +
+    '<div class="cbody">Guardate la lista che avete scritto nella Fase 1. Questa e la domanda piu coraggiosa del laboratorio.</div>' +
+    '</div>' +
+    '<div class="provocazione" style="border-color:rgba(45,106,79,.3);background:rgba(45,106,79,.06)">' +
+    '<span class="emoji">🪞</span>' +
+    '<p style="color:var(--verde)">"Cosa di cio che abbiamo appena scritto somiglia a qualcosa che facciamo gia oggi nella nostra realta lavorativa?"</p>' +
+    '</div>' +
+    '<div class="card">' +
+    '<div class="eyebrow">Il vostro compito</div>' +
+    '<div class="cbody">Siate onesti. Non si tratta di accusare nessuno, ma di riconoscere le prassi rischiose gia presenti. Esempi tipici: uso di traduttori online gratuiti con documenti riservati, assenza di controlli su procedure automatizzate, condivisione di dati personali con strumenti non approvati...</div>' +
+    mkAnswer("f2", "Scrivete qui cosa della lista del disastro assomiglia alla vostra realta quotidiana...") +
+    '</div>' +
+    facAns;
+}
+
+function renderF3() {
+  const fp = isFacilitatore ? facPanel(1, null, "Fase 2: Verita", "") : "";
+  return fp +
+    '<div class="card rosso">' +
+    '<div class="eyebrow">Fase 3 · La Distruzione Creativa</div>' +
+    '<h2 class="ctitle">Cosa dobbiamo smettere di fare subito?</h2>' +
+    '<div class="cbody">Il vostro compito finale non e aggiungere nuove procedure, ma eliminare quelle dannose. Ogni gruppo propone il comportamento piu urgente da abbandonare. Poi votate tutti insieme.</div>' +
+    '</div>' +
+    '<div class="provocazione" style="border-color:rgba(201,125,46,.3);background:rgba(201,125,46,.06)">' +
+    '<span class="emoji">🗑</span>' +
+    '<p style="color:var(--ambra)">"Cosa dobbiamo smettere di fare per aprire lo spazio alla vera innovazione?"</p>' +
+    '</div>' +
+    '<div class="card ambra">' +
+    '<div class="eyebrow">Passo 1 · La proposta del vostro gruppo</div>' +
+    '<div class="cbody">Scegliete il comportamento piu urgente da eliminare tra quelli emersi nella Fase 2 e scrivetelo qui. Usate una sola frase chiara e concreta.</div>' +
+    '<textarea id="ta-f3" class="answer-area" placeholder="Es: Smettere di caricare documenti riservati su strumenti AI gratuiti non approvati" style="min-height:80px">' +
+    (myAnswers["f3"]||"") + '</textarea>' +
+    (!myAnswers["f3"]?'<div style="margin-top:.5rem">' +
+      '<button class="save-btn" id="btn-f3" onclick="submitElimina()">Proponi al gruppo</button>' +
+      '<span class="saved-ok" id="saved-f3">✓ Proposta inviata</span>' +
+      '</div>':'<p style="font-size:.75rem;color:var(--verde);margin-top:.35rem">✓ Proposta inviata</p>') +
+    '</div>' +
+    '<div class="card">' +
+    '<div class="eyebrow">Passo 2 · Votate cosa eliminare</div>' +
+    '<div class="cbody" style="margin-bottom:.75rem">Leggete le proposte di tutti i gruppi e votate quelle che ritenete piu urgenti. Potete votare piu proposte.</div>' +
+    '<ul class="elimina-list" id="elimina-container"></ul>' +
+    '</div>';
+}
+
+// INIT
+renderPhase(0);
+if (isFacilitatore) { listenToAllAnswers(); listenToElimina(); }
+
+window._ready({
+  selectGroup, joinSession, goToPhase, timerToggle, timerReset,
+  sendKangaro, clearKangaro, saveAnswer, submitElimina,
+  resetSessione, downloadReport
+});
+</script>
+</body>
+</html>
