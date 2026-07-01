@@ -1,70 +1,52 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>AI Disaster Board · Modulo 4</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contenuto Laboratorio</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-database-compat.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
+/* Stili identici a quelli del file originale, ma specifici per il contenuto dell'iframe */
 :root{--blu:#1B3A6B;--blu2:#2A5298;--avorio:#F8F6F1;--ambra:#C97D2E;--verde:#2D6A4F;--rosso:#C0392B;--grigio:#6B7280;--gc:#E8E4DC;--bianco:#fff;--ombra:0 4px 24px rgba(27,58,107,.12);--viola:#68458b}
 *{box-sizing:border-box;margin:0;padding:0}body{font-family:"IBM Plex Sans",sans-serif;background:var(--avorio);color:var(--blu);min-height:100vh}button,input,textarea,select{font-family:"IBM Plex Sans",sans-serif}.mono{font-family:"IBM Plex Mono",monospace}.hidden{display:none!important}
-/* landing */
-#screen-join{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:linear-gradient(145deg,var(--blu),#12294d)}.join-logo{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.25em;color:var(--ambra);text-transform:uppercase;margin-bottom:1.2rem}.join-title{font-size:clamp(1.5rem,4vw,2.6rem);font-weight:700;color:var(--avorio);text-align:center;line-height:1.1;max-width:760px;margin-bottom:.5rem}.join-sub{font-size:1rem;color:rgba(248,246,241,.72);text-align:center;max-width:680px;line-height:1.55;margin-bottom:1.5rem}.join-card{background:var(--avorio);border-radius:18px;padding:1.7rem;width:100%;max-width:470px;box-shadow:0 20px 60px rgba(0,0,0,.32)}.join-card h2{font-size:.78rem;text-transform:uppercase;letter-spacing:.14em;color:var(--grigio);margin-bottom:.9rem}.field{margin:.8rem 0}.field label{display:block;font-size:.75rem;text-transform:uppercase;letter-spacing:.12em;color:var(--grigio);font-weight:600;margin-bottom:.35rem}.field input{width:100%;border:2px solid var(--gc);border-radius:10px;background:#fff;padding:.85rem;color:var(--blu);font-size:.95rem}.role-grid{display:grid;grid-template-columns:1fr;gap:.55rem;margin-top:.75rem}.role-btn{display:block;width:100%;padding:.78rem .9rem;border:2px solid var(--gc);border-radius:10px;background:#fff;cursor:pointer;text-align:left;transition:all .16s}.role-btn:hover{border-color:var(--blu2);background:rgba(27,58,107,.04)}.role-btn.selected{border-color:var(--ambra);background:rgba(201,125,46,.08)}.role-btn .rn{font-weight:700;color:var(--blu);font-size:.92rem}.role-btn .rd{font-size:.74rem;color:var(--grigio);margin-top:.14rem;line-height:1.35}.join-btn{width:100%;padding:.9rem;background:var(--blu);color:var(--avorio);border:none;border-radius:10px;font-size:.96rem;font-weight:700;cursor:pointer;margin-top:1.1rem}.join-btn:disabled{opacity:.45;cursor:not-allowed}.tiny{font-size:.72rem;line-height:1.45;color:var(--grigio)}
-/* header */
-#screen-main{display:none;min-height:100vh;flex-direction:column}header{background:var(--blu);color:var(--avorio);padding:.7rem 1.15rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}.hl{display:flex;align-items:center;gap:.8rem;min-width:0}.phase-ind{font-family:"IBM Plex Mono",monospace;font-size:.64rem;letter-spacing:.19em;color:var(--ambra);text-transform:uppercase}.phase-nm{font-size:.9rem;font-weight:700;color:var(--avorio);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conn-st{font-family:"IBM Plex Mono",monospace;font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:rgba(45,106,79,.22);color:#86efac}.conn-st.off{background:rgba(192,57,43,.2);color:#fca5a5}.timer-wrap{display:flex;align-items:center;gap:.6rem}.timer-svg-wrap{position:relative;width:48px;height:48px;flex-shrink:0}.timer-svg-wrap svg{transform:rotate(-90deg)}.timer-track{fill:none;stroke:rgba(248,246,241,.15);stroke-width:4}.timer-fill{fill:none;stroke:var(--ambra);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}.timer-fill.urgent{stroke:var(--rosso);animation:pr 1s ease-in-out infinite}@keyframes pr{0%,100%{opacity:1}50%{opacity:.5}}.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:700;color:var(--avorio)}.tctrls{display:flex;gap:.35rem}.tctrl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);color:var(--avorio);border-radius:6px;padding:.28rem .55rem;font-size:.78rem;cursor:pointer}.tctrl:hover{background:rgba(255,255,255,.2)}
-.phases-bar{background:#fff;border-bottom:1px solid var(--gc);padding:0 1.2rem;display:flex;overflow-x:auto;scrollbar-width:none}.phases-bar::-webkit-scrollbar{display:none}.ptab{padding:.62rem 1rem;font-size:.76rem;font-weight:600;color:var(--grigio);cursor:default;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:700}.ptab.done{color:var(--verde)}.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--grigio);display:block}
 main{flex:1;padding:1.15rem;max-width:1020px;margin:0 auto;width:100%}.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:1rem}.layout.fac{grid-template-columns:minmax(0,1.1fr) 360px}.card{background:#fff;border-radius:13px;padding:1.35rem;margin-bottom:1rem;box-shadow:var(--ombra);border-left:4px solid var(--blu)}.card.ambra{border-left-color:var(--ambra)}.card.verde{border-left-color:var(--verde)}.card.rosso{border-left-color:var(--rosso)}.card.viola{border-left-color:var(--viola)}.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.18em;text-transform:uppercase;color:var(--grigio);margin-bottom:.55rem}.ctitle{font-size:1.12rem;font-weight:800;color:var(--blu);margin-bottom:.65rem;line-height:1.25}.cbody{font-size:.9rem;line-height:1.68;color:#374151}.hbox{background:rgba(201,125,46,.08);border:1px solid rgba(201,125,46,.22);border-radius:9px;padding:.85rem;margin-top:.85rem;font-size:.87rem;line-height:1.55;color:#374151}.dangerbox{background:rgba(192,57,43,.08);border:1px solid rgba(192,57,43,.22);border-radius:9px;padding:.85rem;margin-top:.85rem;font-size:.87rem;line-height:1.55;color:#5d1c16}.quote{font-size:1rem;font-weight:700;line-height:1.45;color:var(--blu);border-left:4px solid var(--ambra);padding-left:.8rem;margin:.8rem 0}.pill{display:inline-block;padding:.24rem .58rem;border-radius:16px;background:rgba(27,58,107,.08);font-size:.72rem;font-weight:700;color:var(--blu);margin:.12rem .2rem .12rem 0}.pill.red{background:rgba(192,57,43,.1);color:var(--rosso)}.pill.green{background:rgba(45,106,79,.1);color:var(--verde)}.pill.amber{background:rgba(201,125,46,.12);color:#8a5317}
-/* options */
 .opts{display:flex;flex-direction:column;gap:.55rem;margin-top:.85rem}.opt{position:relative;padding:.82rem .95rem;border:2px solid var(--gc);border-radius:10px;background:#fff;cursor:pointer;transition:all .18s;overflow:hidden}.opt:hover:not(.locked){border-color:var(--blu2);background:rgba(27,58,107,.04)}.opt.sel{border-color:var(--ambra);background:rgba(201,125,46,.08)}.opt.locked{cursor:default}.opt.bad{border-color:rgba(192,57,43,.28)}.opt.good{border-color:rgba(45,106,79,.28)}.opt .olabel{font-weight:600;color:#25364d;font-size:.88rem;line-height:1.42}.opt .odesc{font-size:.75rem;line-height:1.45;color:var(--grigio);margin-top:.15rem}.locknote{font-size:.78rem;color:var(--verde);font-weight:700;margin-top:.7rem}.muted{color:var(--grigio);font-size:.8rem;line-height:1.5}.save-btn,.nbtn{padding:.56rem 1rem;border-radius:8px;border:2px solid var(--blu);background:var(--blu);color:var(--avorio);font-weight:700;cursor:pointer;transition:all .16s}.save-btn:hover,.nbtn:hover{background:var(--blu2);border-color:var(--blu2)}.nbtn.alt{background:#fff;color:var(--blu)}.nbtn.alt:hover{background:rgba(27,58,107,.06);border-color:var(--blu2)}.nbtn.danger{background:#fff;color:var(--rosso);border-color:var(--rosso)}.nbtn.danger:hover{background:var(--rosso);color:white}.nbtn.green{background:var(--verde);border-color:var(--verde)}.nbtn.green:hover{background:#1e4d38;border-color:#1e4d38}.btnrow{display:flex;gap:.55rem;flex-wrap:wrap;margin-top:.85rem}.fac-panel{background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.12);border-radius:12px;padding:1rem;margin-bottom:1rem}.fac-panel h3{font-size:.67rem;text-transform:uppercase;letter-spacing:.15em;color:var(--grigio);font-family:"IBM Plex Mono",monospace;margin-bottom:.75rem}.group-list{display:flex;flex-direction:column;gap:.5rem}.gcard{background:#fff;border:1px solid var(--gc);border-left:4px solid var(--ambra);border-radius:9px;padding:.6rem .7rem}.gname{font-weight:800;font-size:.85rem;color:var(--blu)}.grole{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--grigio);font-weight:700;margin-top:.08rem}.gchoices{font-size:.74rem;line-height:1.45;color:#374151;margin-top:.35rem}.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.45rem;margin:.75rem 0}.stat{text-align:center;background:#fff;border:1px solid var(--gc);border-radius:8px;padding:.45rem}.statn{font-family:"IBM Plex Mono",monospace;font-size:1.2rem;font-weight:700;color:var(--blu)}.statl{font-size:.62rem;color:var(--grigio);margin-top:.12rem}
-/* results */
 .result-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.85rem}.resrow{background:#fff;border:1px solid var(--gc);border-radius:9px;padding:.6rem .72rem}.reshead{display:flex;justify-content:space-between;gap:.8rem;align-items:center}.reslabel{font-weight:700;font-size:.84rem;color:#25364d}.respct{font-family:"IBM Plex Mono",monospace;font-size:.8rem;font-weight:800;color:var(--blu)}.resbar{height:7px;background:var(--gc);border-radius:10px;margin-top:.45rem;overflow:hidden}.resfill{height:100%;width:0%;background:var(--ambra);border-radius:10px;transition:width .5s}.voters{font-size:.7rem;line-height:1.45;color:var(--grigio);margin-top:.38rem}.voters strong{color:var(--blu)}
-/* projector */
-#screen-proj{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;background:linear-gradient(145deg,var(--blu),#102748);padding:2rem;text-align:center;color:var(--avorio)}.proj-phase{font-family:"IBM Plex Mono",monospace;font-size:.86rem;letter-spacing:.28em;color:var(--ambra);text-transform:uppercase;margin-bottom:.45rem}.proj-title{font-size:clamp(1.9rem,4.2vw,3.4rem);font-weight:800;color:var(--avorio);line-height:1.15;max-width:1100px}.proj-sub{font-size:clamp(.95rem,1.5vw,1.18rem);color:rgba(248,246,241,.72);line-height:1.5;max-width:900px;margin-top:.7rem}.proj-timer{font-family:"IBM Plex Mono",monospace;font-size:clamp(3.7rem,10vw,8rem);font-weight:700;color:var(--avorio);margin:1.2rem 0 .2rem}.proj-timer.urgent{color:var(--rosso);animation:pr 1s ease-in-out infinite}.proj-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;width:100%;max-width:1100px;margin-top:1.4rem}.proj-card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:1rem;text-align:left}.proj-card h3{font-size:.76rem;letter-spacing:.16em;text-transform:uppercase;color:var(--ambra);font-family:"IBM Plex Mono",monospace;margin-bottom:.7rem}.proj-result{width:100%;max-width:860px;margin-top:1.3rem}.proj-opt{background:rgba(255,255,255,.1);border-radius:11px;padding:.82rem 1.05rem;margin-bottom:.56rem;position:relative;overflow:hidden;text-align:left}.proj-bar{position:absolute;top:0;left:0;bottom:0;background:rgba(201,125,46,.38);border-radius:11px;transition:width .6s}.proj-oc{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;gap:1rem}.proj-label{font-size:.96rem;color:var(--avorio);font-weight:700}.proj-pct{font-family:"IBM Plex Mono",monospace;font-size:1rem;color:var(--avorio);font-weight:800}.proj-voters{position:relative;z-index:1;font-size:.76rem;color:rgba(248,246,241,.72);margin-top:.25rem}.qrwrap{display:flex;gap:1.3rem;align-items:center;justify-content:center;margin-top:1.4rem;flex-wrap:wrap}.qrbox{background:#fff;padding:12px;border-radius:12px}.urlbox{font-family:"IBM Plex Mono",monospace;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:.8rem;color:var(--avorio);font-size:.9rem;max-width:680px;word-break:break-all}.watermark{position:fixed;right:1rem;bottom:.8rem;font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.08em;color:rgba(248,246,241,.48)}
-footer{text-align:center;padding:1.25rem;font-size:.72rem;color:var(--grigio);border-top:1px solid var(--gc);margin-top:1.5rem;font-family:"IBM Plex Mono",monospace;letter-spacing:.05em}.copyright{font-weight:700;color:var(--blu)}
-@media(max-width:900px){.layout.fac{grid-template-columns:1fr}.proj-grid{grid-template-columns:1fr}.phase-nm{display:none}.tctrls{display:none}main{padding:.85rem}.statgrid{grid-template-columns:repeat(3,1fr)}}
+.phases-bar{background:#fff;border-bottom:1px solid var(--gc);padding:0 1.2rem;display:flex;overflow-x:auto;scrollbar-width:none}.phases-bar::-webkit-scrollbar{display:none}.ptab{padding:.62rem 1rem;font-size:.76rem;font-weight:600;color:var(--grigio);cursor:default;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:700}.ptab.done{color:var(--verde)}.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--grigio);display:block}
+.persona-card { background: var(--bianco); border-radius: 14px; padding: 1.75rem; box-shadow: var(--ombra); }
+.persona-badge { display: inline-block; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1rem; }
+.badge-direzione { background: rgba(201,125,46,0.1); color: var(--ambra); }
+.badge-acquisti { background: rgba(104,69,139,0.1); color: var(--viola); }
+.badge-segreteria { background: rgba(27,58,107,0.1); color: var(--blu); }
+.badge-it { background: rgba(45,106,79,0.1); color: var(--verde); }
+.badge-dpo { background: rgba(192,57,43,0.1); color: var(--rosso); }
+.badge-docenti { background: #e8e4dc; color: #5e6166; }
+.persona-role { font-size: 1.2rem; font-weight: 700; color: var(--blu); margin-bottom: 0.25rem; }
+.persona-focus { font-size: 0.85rem; color: var(--grigio); margin-bottom: 1.25rem; }
+.persona-section { margin-bottom: 1rem; }
+.persona-section h4 { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--grigio); margin-bottom: 0.4rem; font-family: 'IBM Plex Mono', monospace; }
+.persona-section p { font-size: 0.875rem; line-height: 1.6; color: #374151; }
+.prompt-list { list-style: none; }
+.prompt-list li { padding: 0.6rem 0; border-bottom: 1px solid var(--gc); font-size: 0.875rem; line-height: 1.5; color: #374151; display: flex; gap: 0.5rem; }
+.prompt-list li:last-child { border-bottom: none; }
+.prompt-list li::before { content: "→"; color: var(--ambra); font-weight: 700; flex-shrink: 0; }
+.w3-grid { display: grid; grid-template-columns: 1fr; gap: 1rem; }
+.w3-card { background: var(--bianco); border-radius: 14px; padding: 1.5rem; box-shadow: var(--ombra); }
+.w3-label { font-family: 'IBM Plex Mono', monospace; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; }
+.w3-what { color: var(--blu); }
+.w3-sowhat { color: var(--ambra); }
+.w3-nowwhat { color: var(--verde); }
+.w3-question { font-size: 0.875rem; color: #374151; line-height: 1.6; margin-bottom: 1rem; }
 </style>
 </head>
 <body>
-<div id="screen-join">
-  <div class="join-logo">Modulo 04 · Governance, responsabilità, presidi</div>
-  <h1 class="join-title">AI Disaster Board</h1>
-  <div class="join-sub">Progettiamo il disastro: role play su IA, PNRR, acquisti, silos organizzativi e governance che arriva troppo tardi.</div>
-  <div class="join-card">
-    <h2>Ingresso gruppo</h2>
-    <div class="field"><label>Nome gruppo</label><input id="groupName" placeholder="Es. Gruppo 1" /></div>
-    <div class="field"><label>Scegliete il ruolo da difendere</label><div id="roleBtns" class="role-grid"></div></div>
-    <button id="joinBtn" class="join-btn" disabled>Entra nel laboratorio</button>
-    <p class="tiny" style="margin-top:.8rem">Dopo aver votato, le risposte si bloccano: il laboratorio funziona meglio se il gruppo si assume la responsabilità della scelta.</p>
-  </div>
-</div>
-
-<div id="screen-main">
-  <header>
-    <div class="hl"><span id="conn" class="conn-st off">offline</span><div><div class="phase-ind" id="phaseInd">Modulo 4</div><div class="phase-nm" id="phaseNm">AI Disaster Board</div></div></div>
-    <div class="timer-wrap"><div class="timer-svg-wrap"><svg width="48" height="48"><circle class="timer-track" cx="24" cy="24" r="20"></circle><circle id="timerFill" class="timer-fill" cx="24" cy="24" r="20"></circle></svg><div id="timerText" class="timer-text">--:--</div></div><div id="facTimerCtrls" class="tctrls hidden"><button class="tctrl" id="startBtn">Start</button><button class="tctrl" id="stopBtn">Stop</button></div></div>
-  </header>
-  <div id="phaseTabs" class="phases-bar"></div>
-  <main><div id="app"></div><footer><span class="copyright">© Adriana Augenti · Avvocata</span> · Laboratorio didattico su governance IA nella PA</footer></main>
-</div>
-
-<div id="screen-proj">
-  <div class="proj-phase" id="projPhase">Modulo 4</div>
-  <div class="proj-title" id="projTitle">AI Disaster Board</div>
-  <div class="proj-sub" id="projSub">In attesa della facilitatrice</div>
-  <div class="proj-timer" id="projTimer">--:--</div>
-  <div id="projDynamic"></div>
-  <div class="watermark">© Adriana Augenti · Avvocata</div>
-</div>
-
+    <div id="phaseTabs" class="phases-bar"></div>
+    <main>
+        <div id="app"></div>
+    </main>
 <script>
-const firebaseConfig={apiKey:"AIzaSyBvXY6G8i6Tal_o-ex596yCsqEWVSjPHfE",authDomain:"laboratorio-triz.firebaseapp.com",databaseURL:"https://laboratorio-triz-default-rtdb.europe-west1.firebasedatabase.app",projectId:"laboratorio-triz",storageBucket:"laboratorio-triz.firebasestorage.app",messagingSenderId:"841878394031",appId:"1:841878394031:web:eb2b81732fc229070ff05a"};
-firebase.initializeApp(firebaseConfig);const db=firebase.database();const ROOT='modulo4_disaster_lab';const rootRef=db.ref(ROOT);
-const params=new URLSearchParams(location.search);const IS_FAC=params.get('facilitatore')==='AA2026';const IS_PROJ=params.get('proiettore')==='true';
-const BASE_URL=location.origin+location.pathname;
+let state = {}, groups = {}, myId = null, myRole = null, isFacilitatore = false;
+
 const PHASES=[
  {id:'scenario',title:'Scenario',min:2,kind:'info'},
  {id:'disaster',title:'Progetta il disastro',min:5,kind:'multi'},
@@ -170,18 +152,13 @@ const STOP=[
  {t:'Soluzione finta: bloccare tutto senza offrire strumenti autorizzati e formazione.',score:.25}
 ];
 const POLLS={blame:BLAME,silos:SILOS,stop:STOP};
-const defaultState={phase:0,timer:{running:false,endAt:0,remaining:0,startedByFac:false},reveal:{},forcedCrisis:null,createdAt:Date.now()};
-let state=defaultState, groups={}, selectedRole=null, myId=localStorage.getItem('disasterGroupId')||('g_'+Math.random().toString(36).slice(2,10));localStorage.setItem('disasterGroupId',myId);
-let ticker=null;
+
+function byId(id) { return document.getElementById(id); }
 function esc(s){return String(s||'').replace(/[&<>'"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[m]));}
 function phase(){return PHASES[state.phase]||PHASES[0];}
-function fmt(ms){if(!ms||ms<0)ms=0;const s=Math.ceil(ms/1000);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');}
-function remainingMs(){if(state.timer?.running)return Math.max(0,(state.timer.endAt||0)-Date.now());return state.timer?.remaining||0;}
-function setTimerUI(){const rem=remainingMs();const p=phase();const total=(p.min||0)*60000;const txt=p.min?fmt(rem):'--:--';document.getElementById('timerText').textContent=txt;const fill=document.getElementById('timerFill');const circ=2*Math.PI*20;fill.style.strokeDasharray=circ;fill.style.strokeDashoffset=total?circ*(1-rem/total):circ;fill.classList.toggle('urgent',rem>0&&rem<30000);const pt=document.getElementById('projTimer');if(pt){pt.textContent=txt;pt.classList.toggle('urgent',rem>0&&rem<30000);}if(state.timer?.running&&rem<=0&&IS_FAC){stopTimer(true);} }
-function startTicker(){clearInterval(ticker);ticker=setInterval(()=>{setTimerUI(); if(IS_PROJ) renderProjector();},1000);}
-function getVotesFor(kind){const vs=[];Object.entries(groups||{}).forEach(([id,g])=>{const v=g.votes?.[kind]; if(v!==undefined&&v!==null)vs.push({id,...g,value:v});});return vs;}
 function hasVoted(kind,id=myId){return groups?.[id]?.votes?.[kind]!==undefined;}
 function currentGroup(){return groups?.[myId]||null;}
+function getVotesFor(kind){const vs=[];Object.entries(groups||{}).forEach(([id,g])=>{const v=g.votes?.[kind]; if(v!==undefined&&v!==null)vs.push({id,...g,value:v});});return vs;}
 function groupChoicesSummary(g){let out=[]; if(g?.votes?.disaster){const arr=Array.isArray(g.votes.disaster)?g.votes.disaster:[]; out.push('Mosse: '+arr.map(i=>DISASTER_MOVES[g.role]?.[i]?.t||'').filter(Boolean).join(' · '));} if(g?.votes?.blame!==undefined) out.push('Colpa: '+(BLAME[g.votes.blame]?.t||'')); if(g?.votes?.silos!==undefined) out.push('Silos: '+(SILOS[g.votes.silos]?.t||'')); if(g?.votes?.stop) out.push('Stop: '+g.votes.stop.map(i=>STOP[i]?.t||'').filter(Boolean).join(' · ')); return out.join('<br>');}
 function disasterScores(){const scores={pnrr:0,procurement:0,shadow:0,chatbot:0,valutazione:0,profilazione:0,governance:0};Object.values(groups||{}).forEach(g=>{const moves=DISASTER_MOVES[g.role]||[];(g.votes?.disaster||[]).forEach(i=>{const cat=moves[i]?.cat;if(cat)scores[cat]=(scores[cat]||0)+1;});});return scores;}
 function chosenCrisisKey(){if(state.forcedCrisis&&CRISES[state.forcedCrisis])return state.forcedCrisis;const scores=disasterScores();let best='governance',max=-1;const priority=['pnrr','procurement','shadow','chatbot','valutazione','profilazione','governance'];priority.forEach(k=>{if((scores[k]||0)>max){max=scores[k];best=k;}});return best;}
@@ -189,18 +166,11 @@ function reveal(kind){return !!state.reveal?.[kind];}
 function resultData(kind){let opts=kind==='disaster'?null:POLLS[kind];const votes=getVotesFor(kind);if(kind==='disaster'){const counts={};const voters={};Object.entries(groups||{}).forEach(([id,g])=>{const moves=DISASTER_MOVES[g.role]||[];(g.votes?.disaster||[]).forEach(i=>{const label=(moves[i]?.cat||'altro').toUpperCase();counts[label]=(counts[label]||0)+1;(voters[label]=voters[label]||[]).push(g.name+' · '+(ROLES[g.role]?.short||g.role));});});return Object.keys(counts).sort((a,b)=>counts[b]-counts[a]).map(label=>({label,count:counts[label],pct:votes.length?Math.round(counts[label]/Math.max(1,votes.length*3)*100):0,voters:voters[label]||[]}));}
 const counts=opts.map(()=>0),voters=opts.map(()=>[]);votes.forEach(v=>{if(kind==='stop'){(v.value||[]).forEach(i=>{counts[i]++;voters[i].push(v.name+' · '+(ROLES[v.role]?.short||v.role));});}else{counts[v.value]++;voters[v.value].push(v.name+' · '+(ROLES[v.role]?.short||v.role));}});const total=kind==='stop'?Math.max(1,votes.length):Math.max(1,votes.length);return opts.map((o,i)=>({label:o.t,count:counts[i],pct:Math.round((counts[i]/total)*100),voters:voters[i]||[],score:o.score}));}
 function resultsHTML(kind,showVoters=true,showPct=true){const data=resultData(kind);if(!data.length)return '<p class="muted">Nessuna risposta ancora.</p>';return `<div class="result-list">${data.map(r=>`<div class="resrow"><div class="reshead"><div class="reslabel">${esc(r.label)}</div>${showPct?`<div class="respct">${r.pct}%</div>`:''}</div>${showPct?`<div class="resbar"><div class="resfill" style="width:${r.pct}%;background:${r.score===0?'var(--rosso)':r.score<1?'var(--ambra)':'var(--verde)'}"></div></div>`:''}${showVoters?`<div class="voters"><strong>${r.count}</strong> · ${r.voters.map(esc).join(', ')||'—'}</div>`:''}</div>`).join('')}</div>`;}
-function write(path,val){return rootRef.child(path).set(val);}function update(obj){return rootRef.update(obj);}function vote(kind,val){if(IS_FAC)return; if(hasVoted(kind))return; return rootRef.child('groups/'+myId+'/votes/'+kind).set(val);}
-function startTimer(){const p=phase();if(!p.min)return;write('state/timer',{running:true,endAt:Date.now()+p.min*60000,remaining:p.min*60000,startedByFac:true});}
-function stopTimer(auto=false){const rem=remainingMs();const p=phase();let upd={};upd['state/timer']={running:false,endAt:0,remaining:rem,startedByFac:true};upd['state/reveal/'+p.id]=true;rootRef.update(upd);}
-function nextPhase(){let next=Math.min(state.phase+1,PHASES.length-1);let upd={};upd['state/phase']=next;upd['state/timer']={running:false,endAt:0,remaining:(PHASES[next].min||0)*60000,startedByFac:true};if(PHASES[state.phase])upd['state/reveal/'+PHASES[state.phase].id]=true;rootRef.update(upd);}
-function prevPhase(){let prev=Math.max(state.phase-1,0);rootRef.update({'state/phase':prev,'state/timer':{running:false,endAt:0,remaining:(PHASES[prev].min||0)*60000,startedByFac:true}});}
-function resetLab(){if(confirm('Reset completo del laboratorio?'))rootRef.set({state:defaultState,groups:{}});}
-function initFirebase(){rootRef.child('state').once('value',snap=>{if(!snap.exists()&&IS_FAC)rootRef.child('state').set(defaultState);});rootRef.on('value',snap=>{const data=snap.val()||{};state={...defaultState,...(data.state||{})};groups=data.groups||{};document.getElementById('conn')?.classList.remove('off');document.getElementById('conn')&&(document.getElementById('conn').textContent='online');render();setTimerUI();});firebase.database().ref('.info/connected').on('value',s=>{const on=!!s.val();['conn'].forEach(id=>{const el=document.getElementById(id);if(el){el.classList.toggle('off',!on);el.textContent=on?'online':'offline';}})});startTicker();}
-function renderTabs(){const el=document.getElementById('phaseTabs');el.innerHTML=PHASES.map((p,i)=>`<div class="ptab ${i===state.phase?'active':''} ${i<state.phase?'done':''}"><span class="tt">${String(i+1).padStart(2,'0')}</span>${esc(p.title)}</div>`).join('');}
-function render(){if(IS_PROJ){renderProjector();return;}renderTabs();document.getElementById('phaseInd').textContent='Fase '+String(state.phase+1).padStart(2,'0');document.getElementById('phaseNm').textContent=phase().title;document.getElementById('facTimerCtrls').classList.toggle('hidden',!IS_FAC);if(!IS_FAC&&!currentGroup())return;document.getElementById('screen-join').style.display='none';document.getElementById('screen-main').style.display='flex';const app=document.getElementById('app');app.innerHTML=IS_FAC?facHTML():participantHTML();attachHandlers();}
-function roleButtons(){const el=document.getElementById('roleBtns');el.innerHTML=Object.entries(ROLES).map(([k,r])=>`<button class="role-btn" data-role="${k}"><span class="rn">${esc(r.name)}</span><span class="rd">${esc(r.desc)}</span></button>`).join('');el.querySelectorAll('.role-btn').forEach(b=>b.onclick=()=>{selectedRole=b.dataset.role;el.querySelectorAll('.role-btn').forEach(x=>x.classList.remove('selected'));b.classList.add('selected');document.getElementById('joinBtn').disabled=!(selectedRole&&document.getElementById('groupName').value.trim());});document.getElementById('groupName').oninput=()=>{document.getElementById('joinBtn').disabled=!(selectedRole&&document.getElementById('groupName').value.trim());};document.getElementById('joinBtn').onclick=()=>{const name=document.getElementById('groupName').value.trim();if(!name||!selectedRole)return;rootRef.child('groups/'+myId).set({name,role:selectedRole,joinedAt:Date.now(),votes:{}});};}
-function scenarioHTML(){return `<div class="card ambra"><div class="eyebrow">Scenario comune</div><div class="ctitle">Il tavolo di governance è convocato. Purtroppo.</div><div class="cbody">L’ente deve introdurre strumenti di IA generativa e assistenti AI per sportello studenti, ticket, comunicazione istituzionale, supporto alle segreterie, analisi dati, commissioni e bozze di atti. Ci sono fondi, scadenze, obiettivi e pressione reputazionale. Ogni ufficio porta una ragione vera. Il problema è che, se restano separate, diventano tutte pericolose.</div><div class="quote">Per qualche minuto siete autorizzati a difendere il vostro silos nel modo più corporativo possibile. Poi torniamo ente pubblico.</div></div>`;}
+
+function renderTabs(){const el=byId('phaseTabs');el.innerHTML=PHASES.map((p,i)=>`<div class="ptab ${i===state.phase?'active':''} ${i<state.phase?'done':''}"><span class="tt">${String(i+1).padStart(2,'0')}</span>${esc(p.title)}</div>`).join('');}
+function render(){if(!myId)return;renderTabs();const app=byId('app');app.innerHTML=isFacilitatore?facHTML():participantHTML();attachHandlers();}
 function participantHTML(){const g=currentGroup();const p=phase();const r=ROLES[g.role];let inner='';if(p.id==='scenario')inner=scenarioHTML()+roleCard(g);else if(p.id==='disaster')inner=disasterParticipant(g);else if(p.id==='crisis')inner=crisisHTML(false);else if(p.id==='blame')inner=pollParticipant('blame','Di chi è la colpa?', 'Scegliete la frase difensiva che usereste al tavolo. Alcune sono molto seducenti e molto sbagliate.');else if(p.id==='silos')inner=pollParticipant('silos','Quale silos ha creato il disastro?', 'Ora proviamo a smettere di difenderci: dov’è il difetto di governance?');else if(p.id==='stop')inner=pollParticipant('stop','Stop Doing List', 'Scegliete massimo 3 cose che l’ente deve smettere di fare da domani. Attenzione: ci sono anche finte soluzioni.');else inner=reportParticipant();return `<div class="layout"><div>${inner}</div></div>`;}
+function scenarioHTML(){return `<div class="card ambra"><div class="eyebrow">Scenario comune</div><div class="ctitle">Il tavolo di governance è convocato. Purtroppo.</div><div class="cbody">L’ente deve introdurre strumenti di IA generativa e assistenti AI per sportello studenti, ticket, comunicazione istituzionale, supporto alle segreterie, analisi dati, commissioni e bozze di atti. Ci sono fondi, scadenze, obiettivi e pressione reputazionale. Ogni ufficio porta una ragione vera. Il problema è che, se restano separate, diventano tutte pericolose.</div><div class="quote">Per qualche minuto siete autorizzati a difendere il vostro silos nel modo più corporativo possibile. Poi torniamo ente pubblico.</div></div>`;}
 function roleCard(g){const r=ROLES[g.role];return `<div class="card"><div class="eyebrow">Il vostro ruolo</div><div class="ctitle">${esc(r.name)}</div><p class="cbody">${esc(r.desc)}</p><div class="hbox"><strong>Frase tipica:</strong><br>${esc(r.mantra)}</div></div>`;}
 function disasterParticipant(g){const done=hasVoted('disaster');const moves=DISASTER_MOVES[g.role]||[];const chosen=g.votes?.disaster||[];return `<div class="card rosso"><div class="eyebrow">TRIZ · Progetta il disastro</div><div class="ctitle">Scegliete 3 mosse per far fallire la governance IA</div><p class="cbody">Dovete ragionare dal vostro silos, senza generosità. Quali comportamenti renderebbero il progetto più rischioso?</p><div class="opts" id="disasterOpts">${moves.map((m,i)=>`<div class="opt bad ${chosen.includes(i)?'sel':''} ${done?'locked':''}" data-i="${i}"><div class="olabel">${esc(m.t)}</div><div class="odesc">Area di crisi: ${esc(m.cat.toUpperCase())}</div></div>`).join('')}</div>${done?'<div class="locknote">Risposta acquisita. Non potete più modificarla.</div>':'<div class="btnrow"><button class="save-btn" id="saveDisaster">Conferma le 3 mosse</button></div><p class="muted">Selezionate esattamente 3 opzioni.</p>'}</div>`;}
 function crisisHTML(forFac){const key=chosenCrisisKey();const c=CRISES[key];const scores=disasterScores();return `<div class="card rosso"><div class="eyebrow">Crisi dinamica · ${esc(c.cat)}</div><div class="ctitle">${esc(c.title)}</div><p class="cbody">${esc(c.text)}</p><div class="dangerbox"><strong>Benzina sul fuoco:</strong><br>${esc(c.spark)}</div></div>${forFac?`<div class="card"><div class="eyebrow">Chi ha alimentato questa crisi</div>${resultsHTML('disaster',true,true)}<div class="hbox"><strong>Facoltativo:</strong> se serve per la regia d’aula, puoi forzare una crisi diversa dal pannello laterale.</div></div>`:''}`;}
@@ -208,418 +178,21 @@ function pollParticipant(kind,title,subtitle){const done=hasVoted(kind);const va
 function reportParticipant(){return `<div class="card verde"><div class="eyebrow">Chiusura</div><div class="ctitle">Il report lo scarica la facilitatrice</div><p class="cbody">Grazie: le vostre scelte hanno alimentato la Stop Doing List finale. Ora si ricompone il tavolo e si porta a casa il metodo.</p></div>`;}
 function facHTML(){return `<div class="layout fac"><div>${facMain()}</div><aside>${facSide()}</aside></div>`;}
 function facMain(){const p=phase();if(p.id==='scenario')return scenarioHTML()+`<div class="card"><div class="ctitle">Regia</div><p class="cbody">Fai entrare i gruppi con il QR. Il timer parte solo da qui, dal pannello facilitatrice.</p></div>`;if(p.id==='disaster')return `<div class="card rosso"><div class="eyebrow">Fase attiva</div><div class="ctitle">I gruppi stanno scegliendo le mosse-disastro</div><p class="cbody">Sul tuo pannello vedi sempre gruppi, ruoli e scelte. Sul proiettore puoi mostrare timer e, quando fermi, i risultati aggregati.</p></div><div class="card"><div class="ctitle">Mosse scelte per area di crisi</div>${resultsHTML('disaster',true,true)}</div>`;if(p.id==='crisis')return crisisHTML(true);if(p.id==='blame')return `<div class="card ambra"><div class="eyebrow">Litighiamo bene</div><div class="ctitle">Di chi è la colpa?</div><p class="cbody">Qui devi vedere chi vota cosa: serve per accendere il conflitto controllato.</p></div><div class="card"><div class="ctitle">Voti per gruppo</div>${resultsHTML('blame',true,true)}</div>`;if(p.id==='silos')return `<div class="card ambra"><div class="eyebrow">Basta silos</div><div class="ctitle">Quale silos ha creato il disastro?</div><p class="cbody">Dopo la difesa corporativa, riportali alla responsabilità organizzativa.</p></div><div class="card"><div class="ctitle">Voti per gruppo</div>${resultsHTML('silos',true,true)}</div>`;if(p.id==='stop')return `<div class="card verde"><div class="eyebrow">Stop Doing List</div><div class="ctitle">Cosa smettiamo di fare da domani?</div><p class="cbody">Qui ci sono anche finte soluzioni: disclaimer, responsabile nominale, blocco totale senza alternativa.</p></div><div class="card"><div class="ctitle">Scelte finali</div>${resultsHTML('stop',true,true)}</div>`;return `<div class="card verde"><div class="eyebrow">Report finale</div><div class="ctitle">Scarica il report PDF</div><p class="cbody">Il PDF contiene scenario, crisi generata, mosse scelte, voti per gruppo e Stop Doing List.</p><div class="btnrow"><button class="nbtn green" id="pdfBtn">Scarica PDF</button></div></div>`;}
-function facSide(){const p=phase();return `<div class="fac-panel"><h3>Controlli facilitatrice</h3><div class="btnrow"><button class="nbtn" id="start2">Avvia timer</button><button class="nbtn alt" id="stop2">Stop + rivela risultati</button><button class="nbtn alt" id="prev2">Indietro</button><button class="nbtn" id="next2">Passa fase</button><button class="nbtn danger" id="reset2">Reset</button></div><div class="statgrid"><div class="stat"><div class="statn">${Object.keys(groups).length}</div><div class="statl">gruppi</div></div><div class="stat"><div class="statn">${getVotesFor(p.id).length}</div><div class="statl">voti fase</div></div><div class="stat"><div class="statn">${reveal(p.id)?'SÌ':'NO'}</div><div class="statl">risultati</div></div></div></div><div class="fac-panel"><h3>QR partecipanti</h3><div id="qrFac" style="background:white;display:inline-block;padding:8px;border-radius:8px"></div><div class="muted" style="margin-top:.5rem;word-break:break-all">${esc(BASE_URL)}</div></div><div class="fac-panel"><h3>Crisi dinamica</h3><div class="muted">Crisi attuale: <strong>${esc(CRISES[chosenCrisisKey()].cat)}</strong></div><select id="forceCrisis" style="width:100%;margin-top:.55rem;padding:.55rem;border:1px solid var(--gc);border-radius:7px"><option value="">Automatica dalle scelte</option>${Object.entries(CRISES).map(([k,c])=>`<option value="${k}" ${state.forcedCrisis===k?'selected':''}>${esc(c.cat)}</option>`).join('')}</select></div><div class="fac-panel"><h3>Gruppi e scelte</h3><div class="group-list">${Object.entries(groups).map(([id,g])=>`<div class="gcard"><div class="gname">${esc(g.name||id)}</div><div class="grole">${esc(ROLES[g.role]?.name||g.role)}</div><div class="gchoices">${groupChoicesSummary(g)||'<span class="muted">Nessuna scelta ancora</span>'}</div></div>`).join('')||'<p class="muted">Nessun gruppo entrato.</p>'}</div></div>`;}
-function attachHandlers(){['startBtn','start2'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=startTimer});['stopBtn','stop2'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>stopTimer(false)});const n=document.getElementById('next2');if(n)n.onclick=nextPhase;const pr=document.getElementById('prev2');if(pr)pr.onclick=prevPhase;const rs=document.getElementById('reset2');if(rs)rs.onclick=resetLab;const fc=document.getElementById('forceCrisis');if(fc)fc.onchange=()=>rootRef.child('state/forcedCrisis').set(fc.value||null);const pdf=document.getElementById('pdfBtn');if(pdf)pdf.onclick=generatePDF;setTimeout(()=>{const q=document.getElementById('qrFac'); if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:BASE_URL,width:120,height:120,colorDark:'#1B3A6B',colorLight:'#ffffff'});}},50);
-const dis=document.getElementById('disasterOpts');if(dis){let sel=[];dis.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{if(hasVoted('disaster'))return;const i=+o.dataset.i;if(sel.includes(i)){sel=sel.filter(x=>x!==i);o.classList.remove('sel');}else if(sel.length<3){sel.push(i);o.classList.add('sel');}});const b=document.getElementById('saveDisaster');if(b)b.onclick=()=>{if(sel.length!==3){alert('Scegli esattamente 3 mosse-disastro.');return;}vote('disaster',sel);};}
-const po=document.getElementById('pollOpts');if(po){const kind=po.dataset.kind;const multi=po.dataset.multi==='true';let sel=[];po.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{if(hasVoted(kind))return;const i=+o.dataset.i;if(multi){if(sel.includes(i)){sel=sel.filter(x=>x!==i);o.classList.remove('sel');}else if(sel.length<3){sel.push(i);o.classList.add('sel');}}else{sel=[i];po.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');}});const b=document.getElementById('savePoll');if(b)b.onclick=()=>{if(!sel.length){alert('Scegli almeno una risposta.');return;}vote(kind,multi?sel:sel[0]);};}}
-function renderProjector(){document.getElementById('screen-join').style.display='none';document.getElementById('screen-main').style.display='none';document.getElementById('screen-proj').style.display='flex';const p=phase();document.getElementById('projPhase').textContent='Fase '+String(state.phase+1).padStart(2,'0')+' · '+p.title;document.getElementById('projTitle').textContent=projectorTitle(p);document.getElementById('projSub').textContent=projectorSub(p);const dyn=document.getElementById('projDynamic');setTimerUI();if(p.id==='scenario'){dyn.innerHTML=`<div class="qrwrap"><div class="qrbox"><div id="qrProj"></div></div><div class="urlbox">${esc(BASE_URL)}</div></div><div class="proj-sub">Entrate come gruppo, scegliete il ruolo e preparatevi a difendere il vostro silos.</div>`;setTimeout(()=>{const q=document.getElementById('qrProj');if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:BASE_URL,width:210,height:210,colorDark:'#1B3A6B',colorLight:'#ffffff'});}},20);return;}
-if(p.id==='crisis'){const c=CRISES[chosenCrisisKey()];dyn.innerHTML=`<div class="proj-card" style="max-width:980px;margin-top:1.4rem;text-align:left"><h3>${esc(c.cat)}</h3><div style="font-size:1.2rem;font-weight:800;margin-bottom:.55rem">${esc(c.title)}</div><div style="line-height:1.55;color:rgba(248,246,241,.86)">${esc(c.text)}</div><div style="margin-top:.8rem;color:#f3c58e;font-weight:800">${esc(c.spark)}</div></div>${resultsProjector('disaster')}`;return;}
-if(['disaster','blame','silos','stop'].includes(p.id)){dyn.innerHTML=reveal(p.id)?resultsProjector(p.id):`<div class="proj-sub" style="margin-top:1rem">Risposte nascoste ai partecipanti. La facilitatrice vede gruppi e scelte in tempo reale.</div><div class="proj-sub">Gruppi entrati: <strong>${Object.keys(groups).length}</strong> · Voti fase: <strong>${getVotesFor(p.id).length}</strong></div>`;return;}
-dyn.innerHTML=p.id==='report'?`<div class="proj-sub">Report PDF dal pannello facilitatrice. Grazie e smettiamo di progettare disastri.</div>`:'';}
-function projectorTitle(p){if(p.id==='scenario')return 'AI Disaster Board';if(p.id==='disaster')return 'Progettiamo il disastro';if(p.id==='crisis')return 'Crisi dinamica';if(p.id==='blame')return 'Di chi è la colpa?';if(p.id==='silos')return 'Quale silos ha creato il disastro?';if(p.id==='stop')return 'Stop Doing List';return 'Report finale';}
-function projectorSub(p){if(p.id==='scenario')return 'Governance IA, PNRR, silos e responsabilità che non si parlano.';if(p.id==='disaster')return 'Ogni gruppo sceglie tre mosse distruttive. Sul proiettore i risultati compariranno quando la facilitatrice li rivela.';if(p.id==='crisis')return 'La crisi nasce dalle scelte dei gruppi. Ora si litiga bene.';if(p.id==='blame')return 'Difendete il vostro ufficio: per pochi minuti è consentito essere corporativi.';if(p.id==='silos')return 'Ora smettiamo di difenderci: qual è il difetto organizzativo?';if(p.id==='stop')return 'Da domani: cosa smettiamo di fare?';return 'Sintesi finale';}
-function resultsProjector(kind){const data=resultData(kind);if(!data.length)return '<div class="proj-sub">Nessuna risposta ancora.</div>';return `<div class="proj-result">${data.map(r=>`<div class="proj-opt"><div class="proj-bar" style="width:${r.pct}%;background:${r.score===0?'rgba(192,57,43,.55)':r.score<1?'rgba(201,125,46,.50)':'rgba(45,106,79,.55)'}"></div><div class="proj-oc"><div class="proj-label">${esc(r.label)}</div><div class="proj-pct">${r.pct}%</div></div><div class="proj-voters">${r.voters.map(esc).join(' · ')||'—'}</div></div>`).join('')}</div>`;}
-function generatePDF(){const {jsPDF}=window.jspdf||{};if(!jsPDF){alert('Libreria PDF non caricata. Controlla la connessione.');return;}const doc=new jsPDF({unit:'mm',format:'a4'});let y=15;function add(t,size=11,bold=false){doc.setFont('helvetica',bold?'bold':'normal');doc.setFontSize(size);const lines=doc.splitTextToSize(String(t||''),180);lines.forEach(line=>{if(y>282){doc.addPage();y=15;}doc.text(line,15,y);y+=size*0.42+2;});}
-add('AI Disaster Board · Report laboratorio',18,true);add('© Adriana Augenti · Avvocata',10);y+=3;add('Crisi generata: '+CRISES[chosenCrisisKey()].title,13,true);add(CRISES[chosenCrisisKey()].text,10);y+=2;add('Gruppi e scelte',13,true);Object.entries(groups).forEach(([id,g])=>{add((g.name||id)+' · '+(ROLES[g.role]?.name||g.role),11,true);const s=groupChoicesSummary(g).replace(/<br>/g,'\n').replace(/<[^>]+>/g,'');add(s||'Nessuna scelta registrata',9);y+=1;});add('Stop Doing List · risultati',13,true);resultData('stop').filter(r=>r.count>0).forEach(r=>add(`${r.label} — ${r.count} gruppi (${r.voters.join(', ')})`,9));add('Nota metodologica',13,true);add('Il laboratorio usa il metodo TRIZ: progettare intenzionalmente il disastro per riconoscere i comportamenti da interrompere. La governance IA non è un silos: richiede direzione, responsabili del procedimento, IT/RTD, DPO, RUP/DEC, uffici utilizzatori e, quando serve, didattica/commissioni.',10);doc.save('AI_Disaster_Board_Report_Adriana_Augenti.pdf');}
-if(IS_PROJ){document.getElementById('screen-proj').style.display='flex';document.getElementById('screen-join').style.display='none';}else if(IS_FAC){document.getElementById('screen-join').style.display='none';document.getElementById('screen-main').style.display='flex';}else{roleButtons();}
-initFirebase();
-</script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="it">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Modulo 4 · AI Disaster Board</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
-<style>
-:root{
-  --blu:#1B3A6B;--blu2:#2A5298;--avorio:#F8F6F1;--ambra:#C97D2E;
-  --verde:#2D6A4F;--rosso:#C0392B;--grigio:#6B7280;--gc:#E8E4DC;
-  --bianco:#FFFFFF;--ombra:0 4px 24px rgba(27,58,107,.12);
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:"IBM Plex Sans",sans-serif;background:var(--avorio);color:var(--blu);min-height:100vh}
-button,input,textarea{font-family:"IBM Plex Sans",sans-serif}
-.hidden{display:none!important}.mono{font-family:"IBM Plex Mono",monospace}.small{font-size:.78rem;color:var(--grigio);line-height:1.5}.mt{margin-top:.8rem}.mb{margin-bottom:.8rem}
+function facSide(){const p=phase();return `<div class="fac-panel"><h3>Controlli facilitatrice</h3><div class="btnrow"><button class="nbtn" id="start2">Avvia timer</button><button class="nbtn alt" id="stop2">Stop + rivela risultati</button><button class="nbtn alt" id="prev2">Indietro</button><button class="nbtn" id="next2">Passa fase</button><button class="nbtn danger" id="reset2">Reset</button></div><div class="statgrid"><div class="stat"><div class="statn">${Object.keys(groups).length}</div><div class="statl">gruppi</div></div><div class="stat"><div class="statn">${getVotesFor(p.id).length}</div><div class="statl">voti fase</div></div><div class="stat"><div class="statn">${reveal(p.id)?'SÌ':'NO'}</div><div class="statl">risultati</div></div></div></div><div class="fac-panel"><h3>QR partecipanti</h3><div id="qrFac" style="background:white;display:inline-block;padding:8px;border-radius:8px"></div><div class="muted" style="margin-top:.5rem;word-break:break-all">${esc(parent.BASE_URL)}</div></div><div class="fac-panel"><h3>Crisi dinamica</h3><div class="muted">Crisi attuale: <strong>${esc(CRISES[chosenCrisisKey()].cat)}</strong></div><select id="forceCrisis" style="width:100%;margin-top:.55rem;padding:.55rem;border:1px solid var(--gc);border-radius:7px"><option value="">Automatica dalle scelte</option>${Object.entries(CRISES).map(([k,c])=>`<option value="${k}" ${state.forcedCrisis===k?'selected':''}>${esc(c.cat)}</option>`).join('')}</select></div><div class="fac-panel"><h3>Gruppi e scelte</h3><div class="group-list">${Object.entries(groups).map(([id,g])=>`<div class="gcard"><div class="gname">${esc(g.name||id)}</div><div class="grole">${esc(ROLES[g.role]?.name||g.role)}</div><div class="gchoices">${groupChoicesSummary(g)||'<span class="muted">Nessuna scelta ancora</span>'}</div></div>`).join('')||'<p class="muted">Nessun gruppo entrato.</p>'}</div></div>`;}
+function attachHandlers(){['start2'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>parent.startTimer()});['stop2'].forEach(id=>{const el=document.getElementById(id);if(el)el.onclick=()=>parent.stopTimer(false)});const n=document.getElementById('next2');if(n)n.onclick=()=>parent.nextPhase();const pr=document.getElementById('prev2');if(pr)pr.onclick=()=>parent.prevPhase();const rs=document.getElementById('reset2');if(rs)rs.onclick=()=>parent.resetLab();const fc=document.getElementById('forceCrisis');if(fc)fc.onchange=()=>parent.rootRef.child('state/forcedCrisis').set(fc.value||null);const pdf=document.getElementById('pdfBtn');if(pdf)pdf.onclick=()=>parent.generatePDF();setTimeout(()=>{const q=document.getElementById('qrFac'); if(q&&window.QRCode){q.innerHTML='';new QRCode(q,{text:parent.BASE_URL,width:120,height:120,colorDark:'#1B3A6B',colorLight:'#ffffff'});}},50);
+const dis=document.getElementById('disasterOpts');if(dis){let sel=[];dis.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{if(hasVoted('disaster'))return;const i=+o.dataset.i;if(sel.includes(i)){sel=sel.filter(x=>x!==i);o.classList.remove('sel');}else if(sel.length<3){sel.push(i);o.classList.add('sel');}});const b=document.getElementById('saveDisaster');if(b)b.onclick=()=>{if(sel.length!==3){alert('Scegli esattamente 3 mosse-disastro.');return;}parent.postMessage({type:'VOTE',pollId:'disaster',value:sel},'*');};}
+const po=document.getElementById('pollOpts');if(po){const kind=po.dataset.kind;const multi=po.dataset.multi==='true';let sel=[];po.querySelectorAll('.opt').forEach(o=>o.onclick=()=>{if(hasVoted(kind))return;const i=+o.dataset.i;if(multi){if(sel.includes(i)){sel=sel.filter(x=>x!==i);o.classList.remove('sel');}else if(sel.length<3){sel.push(i);o.classList.add('sel');}}else{sel=[i];po.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');}});const b=document.getElementById('savePoll');if(b)b.onclick=()=>{if(!sel.length){alert('Scegli almeno una risposta.');return;}parent.postMessage({type:'VOTE',pollId:kind,value:multi?sel:sel[0]},'*');};}}
 
-/* LANDING / JOIN */
-.screen-full{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--blu)}
-.logo{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.28em;color:var(--ambra);text-transform:uppercase;margin-bottom:1.25rem;text-align:center}
-.hero-title{font-size:clamp(1.65rem,4vw,3rem);font-weight:700;color:var(--avorio);text-align:center;line-height:1.12;max-width:820px;margin-bottom:.65rem}
-.hero-sub{font-size:1rem;color:rgba(248,246,241,.72);text-align:center;max-width:780px;line-height:1.55;margin-bottom:1.4rem}
-.hero-card{background:rgba(248,246,241,.08);border:1px solid rgba(248,246,241,.16);border-radius:18px;padding:1rem 1.2rem;color:var(--avorio);max-width:760px;line-height:1.55;margin-bottom:1.35rem}
-.hero-card strong{color:var(--ambra)}
-.primary-big{padding:.92rem 1.35rem;background:var(--ambra);color:#fff;border:0;border-radius:10px;font-size:.96rem;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-.primary-big:hover{filter:brightness(1.05)}
-.join-card{background:var(--avorio);border-radius:16px;padding:2rem;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.join-card h2{font-size:.78rem;font-weight:700;color:var(--grigio);text-transform:uppercase;letter-spacing:.14em;margin-bottom:1rem;font-family:"IBM Plex Mono",monospace}
-.role-btn{display:block;width:100%;padding:.86rem 1rem;margin-bottom:.62rem;border:2px solid var(--gc);border-radius:10px;background:#fff;cursor:pointer;text-align:left;transition:all .2s}
-.role-btn:hover{border-color:var(--blu2);background:rgba(27,58,107,.035)}.role-btn.selected{border-color:var(--ambra);background:rgba(201,125,46,.07)}
-.role-btn .rn{font-weight:700;font-size:.95rem;color:var(--blu);display:block}.role-btn .rd{font-size:.75rem;color:var(--grigio);margin-top:.2rem;line-height:1.35}
-.join-btn{width:100%;padding:.9rem;background:var(--blu);color:var(--avorio);border:0;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:1.1rem}.join-btn:disabled{opacity:.45;cursor:not-allowed}
-.info-box{background:rgba(201,125,46,.1);border:1px solid rgba(201,125,46,.32);border-radius:8px;padding:.82rem;margin-bottom:1rem;font-size:.82rem;line-height:1.5;color:#78450f}
-
-/* MAIN */
-#screen-main{display:none;min-height:100vh;flex-direction:column}
-header{background:var(--blu);color:var(--avorio);padding:.7rem 1.15rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}
-.hl{display:flex;align-items:center;gap:.75rem;min-width:0}.phase-ind{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;color:var(--ambra);text-transform:uppercase;white-space:nowrap}.phase-nm{font-size:.92rem;font-weight:700;color:var(--avorio);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.timer-wrap{display:flex;align-items:center;gap:.55rem}.timer-svg-wrap{position:relative;width:48px;height:48px;flex-shrink:0}.timer-svg-wrap svg{transform:rotate(-90deg)}.timer-track{fill:none;stroke:rgba(248,246,241,.15);stroke-width:4}.timer-fill{fill:none;stroke:var(--ambra);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}.timer-fill.urgent{stroke:var(--rosso);animation:pr 1s ease-in-out infinite}@keyframes pr{0%,100%{opacity:1}50%{opacity:.5}}
-.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:700;color:var(--avorio)}
-.tctrls{display:flex;gap:.35rem}.tctrl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:var(--avorio);border-radius:6px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer}.tctrl:hover{background:rgba(255,255,255,.22)}
-.conn-st{font-family:"IBM Plex Mono",monospace;font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:rgba(45,106,79,.2);color:#86efac}.conn-st.off{background:rgba(192,57,43,.2);color:#fca5a5}
-.phases-bar{background:#fff;border-bottom:1px solid var(--gc);padding:0 1.25rem;display:flex;overflow-x:auto;scrollbar-width:none}.phases-bar::-webkit-scrollbar{display:none}.ptab{padding:.68rem 1.05rem;font-size:.76rem;font-weight:600;color:var(--grigio);border-bottom:3px solid transparent;white-space:nowrap}.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:700}.ptab.done{color:var(--verde)}.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--grigio);display:block;font-weight:400}
-main{flex:1;padding:1.25rem;max-width:900px;margin:0 auto;width:100%}
-.card{background:#fff;border-radius:12px;padding:1.45rem;margin-bottom:1rem;box-shadow:var(--ombra);border-left:4px solid var(--blu)}.card.ambra{border-left-color:var(--ambra)}.card.verde{border-left-color:var(--verde)}.card.rosso{border-left-color:var(--rosso)}
-.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grigio);margin-bottom:.55rem}.ctitle{font-size:1.12rem;font-weight:800;color:var(--blu);margin-bottom:.65rem;line-height:1.25}.cbody{font-size:.9rem;line-height:1.7;color:#374151}.quote{background:rgba(201,125,46,.09);border:1px solid rgba(201,125,46,.24);border-radius:10px;padding:.9rem 1rem;line-height:1.6;margin-top:.9rem;color:#68400f}.quote strong{color:var(--ambra)}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}.role-mini{border:2px solid var(--gc);background:#fff;border-radius:12px;padding:1rem}.role-mini h3{font-size:.9rem;color:var(--blu);margin-bottom:.35rem}.role-mini p{font-size:.78rem;color:#4b5563;line-height:1.45}.tag{display:inline-block;padding:.18rem .55rem;border-radius:4px;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.t-r{background:rgba(192,57,43,.1);color:var(--rosso)}.t-a{background:rgba(201,125,46,.12);color:var(--ambra)}.t-b{background:rgba(27,58,107,.1);color:var(--blu)}.t-v{background:rgba(45,106,79,.1);color:var(--verde)}
-.choice{position:relative;padding:.85rem .95rem;border:2px solid var(--gc);border-radius:10px;background:#fff;margin-bottom:.55rem;cursor:pointer;transition:all .18s;line-height:1.45;color:#374151}.choice:hover{border-color:var(--blu2);background:rgba(27,58,107,.035)}.choice.selected{border-color:var(--ambra);background:rgba(201,125,46,.08)}.choice.disabled{opacity:.52;cursor:not-allowed}.choice .meta{display:block;margin-top:.25rem;font-size:.68rem;color:var(--grigio);font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.07em}.save-btn{margin-top:.65rem;padding:.55rem 1.1rem;background:var(--blu);color:var(--avorio);border:0;border-radius:8px;font-size:.83rem;font-weight:700;cursor:pointer}.save-btn:hover{background:var(--blu2)}.save-btn:disabled{opacity:.45;cursor:not-allowed}.saved-badge{display:inline-block;margin-left:.55rem;font-size:.76rem;color:var(--verde);font-weight:700;opacity:0;transition:opacity .3s}.show{opacity:1!important}
-.poll-opt{position:relative;padding:.82rem .95rem;border:2px solid var(--gc);border-radius:10px;cursor:pointer;background:#fff;overflow:hidden;margin-bottom:.52rem;transition:all .2s}.poll-opt:hover{border-color:var(--blu2)}.poll-opt.sel{border-color:var(--ambra);background:rgba(201,125,46,.06)}.poll-opt.locked{cursor:default}.pbar{position:absolute;left:0;top:0;bottom:0;width:0%;z-index:0;transition:width .6s ease,background .6s ease}.poc{position:relative;z-index:1;display:flex;justify-content:space-between;gap:.75rem;align-items:center}.plabel{font-size:.86rem;line-height:1.35;color:#374151}.ppct{font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:800;min-width:42px;text-align:right}.pcnt{font-size:.68rem;color:var(--grigio)}
-.fac-panel{background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.13);border-radius:10px;padding:1rem;margin-bottom:1rem}.fac-panel h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--grigio);font-family:"IBM Plex Mono",monospace;margin-bottom:.8rem}.nav-btns{display:flex;gap:.55rem;flex-wrap:wrap}.nbtn{padding:.5rem .88rem;border-radius:7px;border:2px solid var(--blu);background:transparent;color:var(--blu);font-size:.8rem;font-weight:700;cursor:pointer}.nbtn:hover{background:var(--blu);color:var(--avorio)}.nbtn.pri{background:var(--blu);color:var(--avorio)}.nbtn.danger{border-color:var(--rosso);color:var(--rosso)}.nbtn.danger:hover{background:var(--rosso);color:#fff}
-.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.85rem}.stat{background:#fff;border:1px solid var(--gc);border-radius:8px;padding:.55rem;text-align:center}.stat .n{font-family:"IBM Plex Mono",monospace;font-size:1.25rem;font-weight:800;color:var(--blu)}.stat .l{font-size:.62rem;color:var(--grigio);margin-top:.12rem}
-.crisis-title{font-size:1.25rem;font-weight:800;color:var(--rosso);margin-bottom:.55rem}.crisis-box{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);border-radius:12px;padding:1rem;line-height:1.65;color:#3f1c18}.fight-line{padding:.65rem .75rem;background:#fff;border-radius:8px;border-left:3px solid var(--ambra);margin-bottom:.45rem;font-size:.84rem;line-height:1.45;color:#374151}.fight-line strong{color:var(--blu)}
-textarea{width:100%;min-height:92px;border:2px solid var(--gc);border-radius:8px;padding:.75rem;font-size:.88rem;color:var(--blu);background:var(--avorio);resize:vertical;margin-top:.65rem}textarea:focus{outline:none;border-color:var(--ambra)}
-.report{background:#fff;border-radius:12px;padding:1.2rem;box-shadow:var(--ombra);border-top:4px solid var(--verde)}.report h3{font-size:1rem;margin-bottom:.55rem}.report ul{padding-left:1.1rem;line-height:1.65;color:#374151;font-size:.88rem}.report-btn{display:block;width:100%;padding:1rem;background:var(--verde);color:#fff;border:0;border-radius:10px;font-size:.98rem;font-weight:800;cursor:pointer;margin-top:1rem}.report-btn:hover{background:#1e4d38}
-footer{text-align:center;padding:1.1rem;font-size:.72rem;color:var(--grigio);border-top:1px solid var(--gc);margin-top:1.4rem;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em}
-
-/* PROJECTOR */
-#screen-proj{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;background:var(--blu);padding:2rem;text-align:center;color:var(--avorio)}.proj-phase{font-family:"IBM Plex Mono",monospace;font-size:.82rem;letter-spacing:.28em;color:var(--ambra);text-transform:uppercase;margin-bottom:.45rem}.proj-title{font-size:clamp(1.7rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1.4rem}.proj-timer{font-family:"IBM Plex Mono",monospace;font-size:clamp(3rem,10vw,7rem);font-weight:800;margin-bottom:.5rem}.proj-timer.urgent{color:var(--rosso);animation:pr 1s ease-in-out infinite}.proj-help{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;max-width:760px;line-height:1.5}.proj-results{width:100%;max-width:780px;margin-top:1rem}.proj-opt{background:rgba(255,255,255,.1);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:.62rem;display:flex;align-items:center;position:relative;overflow:hidden}.proj-bar{position:absolute;left:0;top:0;bottom:0;border-radius:10px;transition:width .8s ease,background .8s ease}.proj-oc{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem}.proj-label{font-size:1rem;font-weight:600;text-align:left;color:var(--avorio)}.proj-pct{font-family:"IBM Plex Mono",monospace;font-size:1.08rem;font-weight:800;color:var(--avorio)}
-@media(max-width:680px){.phase-nm{display:none}main{padding:.85rem}.grid{grid-template-columns:1fr}.tctrls{display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
-</style>
-</head>
-<body>
-
-<div id="screen-landing" class="screen-full">
-  <div class="logo">Modulo 04 · Governance, etica, responsabilità</div>
-  <h1 class="hero-title">AI Disaster Board</h1>
-  <p class="hero-sub">Progettiamo il disastro: come far fallire la governance dell’IA ragionando a silos.</p>
-  <div class="hero-card"><strong>Regola del gioco:</strong> per qualche minuto ogni ufficio può difendere il proprio silos. Poi si torna ente pubblico e si scrive la Stop Doing List.</div>
-  <button class="primary-big" onclick="showRoleScreen()">Entra nel tavolo di governance</button>
-</div>
-
-<div id="screen-join" class="screen-full hidden">
-  <div class="join-card">
-    <div class="info-box">Scegli il ruolo del tuo gruppo. Un dispositivo per gruppo. Non servono dati reali: si lavora solo su scenario fittizio.</div>
-    <h2>Scegli il ruolo</h2>
-    <button class="role-btn" id="btn-direzione" onclick="selectRole('direzione')"><span class="rn">Direzione / Governance PNRR</span><span class="rd">Fondi, milestone, reputazione, velocità.</span></button>
-    <button class="role-btn" id="btn-rup" onclick="selectRole('rup')"><span class="rn">Ufficio acquisti / RUP / DEC</span><span class="rd">Capitolato, fornitore, collaudo, documentazione.</span></button>
-    <button class="role-btn" id="btn-segreteria" onclick="selectRole('segreteria')"><span class="rn">Segreteria studenti / Front office</span><span class="rd">Ticket, mail, studenti arrabbiati, tempi impossibili.</span></button>
-    <button class="role-btn" id="btn-it" onclick="selectRole('it')"><span class="rn">IT / RTD / Sistemi informativi</span><span class="rd">Sicurezza, log, account, strumenti autorizzati.</span></button>
-    <button class="role-btn" id="btn-dpo" onclick="selectRole('dpo')"><span class="rn">DPO / Privacy / Compliance</span><span class="rd">Dati personali, DPIA, minimizzazione, trasparenza.</span></button>
-    <button class="role-btn" id="btn-docenti" onclick="selectRole('docenti')"><span class="rn">Docenti / Commissioni / Area didattica</span><span class="rd">Valutazione, autonomia, merito, prove artistiche.</span></button>
-    <button class="join-btn" id="join-btn" disabled onclick="joinSession()">Partecipa</button>
-  </div>
-</div>
-
-<div id="screen-main">
-  <header>
-    <div class="hl"><span class="conn-st" id="conn-st">●</span><div><div class="phase-ind" id="phase-ind">FASE 1</div><div class="phase-nm" id="phase-nm">Scenario</div></div></div>
-    <div class="timer-wrap">
-      <div class="timer-svg-wrap"><svg width="48" height="48"><circle class="timer-track" cx="24" cy="24" r="20"></circle><circle class="timer-fill" id="timer-circle" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"></circle></svg><div class="timer-text" id="timer-display">0:00</div></div>
-      <div class="tctrls" id="tctrls"><button class="tctrl" onclick="timerToggle()" id="timer-toggle">⏸</button><button class="tctrl" onclick="timerReset()">↺</button></div>
-    </div>
-  </header>
-  <div class="phases-bar" id="phases-bar"></div>
-  <main>
-    <div id="fac-panel" class="fac-panel hidden"></div>
-    <div id="content"></div>
-  </main>
-  <footer>AI Disaster Board · Avv.ta Adriana Augenti – Avvocata</footer>
-</div>
-
-<div id="screen-proj">
-  <div class="proj-phase" id="proj-phase-label">FASE 1</div>
-  <div class="proj-title" id="proj-phase-name">Scenario</div>
-  <div class="proj-timer" id="proj-timer">0:00</div>
-  <div class="proj-help" id="proj-help">Apri il link della SPA dal dispositivo del gruppo. Il timer fa terrorismo istituzionale, ma per una buona causa.</div>
-  <div class="proj-results" id="proj-results"></div>
-</div>
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, push, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyBvXY6G8i6Tal_o-ex596yCsqEWVSjPHfE",
-  authDomain: "laboratorio-triz.firebaseapp.com",
-  databaseURL: "https://laboratorio-triz-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "laboratorio-triz",
-  storageBucket: "laboratorio-triz.firebasestorage.app",
-  messagingSenderId: "841878394031",
-  appId: "1:841878394031:web:eb2b81732fc229070ff05a"
-};
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
-const ROOT = 'modulo4_disaster_lab';
-
-let myRole = null, isFacilitatore=false, isProiettore=false, currentPhase=0, timerInterval=null, projTimerInterval=null;
-let myId = localStorage.getItem('ai_disaster_client_id');
-if(!myId){ myId = 'g_' + Math.random().toString(36).slice(2,10); localStorage.setItem('ai_disaster_client_id', myId); }
-let localChoices = [];
-let localVotes = {};
-
-const PHASES = [
-  {name:'Scenario', mins:2},
-  {name:'Progetta il disastro', mins:5},
-  {name:'Crisi dinamica', mins:5},
-  {name:'Litighiamo bene', mins:4},
-  {name:'Stop Doing List', mins:4},
-  {name:'Report finale', mins:2}
-];
-
-const ROLES = {
-  direzione:{name:'Direzione / Governance PNRR', badge:'PNRR', line:'Abbiamo fondi, scadenze e indicatori: non possiamo restare fermi.'},
-  rup:{name:'Ufficio acquisti / RUP / DEC', badge:'CAPITOLATO', line:'Se volete log, audit e limiti d’uso, dovete dirmelo prima del capitolato.'},
-  segreteria:{name:'Segreteria studenti / Front office', badge:'FRONT OFFICE', line:'Se il chatbot ci toglie il 40% delle mail, io lo voglio domani.'},
-  it:{name:'IT / RTD / Sistemi informativi', badge:'LOG', line:'Se ognuno usa il tool che vuole, poi quando succede qualcosa venite tutti da noi.'},
-  dpo:{name:'DPO / Privacy / Compliance', badge:'DPIA', line:'Prima di parlare di IA, ditemi quali dati trattate e dove finiscono.'},
-  docenti:{name:'Docenti / Commissioni / Area didattica', badge:'VALUTAZIONE', line:'La valutazione non è un ticket amministrativo.'}
-};
-
-const MOVES = {
-  direzione:[
-    {t:'Annunciare il progetto IA prima di definire ruoli, policy e perimetro.', cats:['pnrr','governance']},
-    {t:'Spingere per partire subito perché ci sono milestone PNRR e indicatori da rendicontare.', cats:['pnrr']},
-    {t:'Chiedere agli uffici di “sperimentare liberamente” per accelerare.', cats:['shadow','governance']},
-    {t:'Misurare il successo solo sul numero di ticket ridotti.', cats:['chatbot','governance']},
-    {t:'Convocare DPO, IT e RUP solo quando il progetto è già deciso.', cats:['governance','pnrr']}
-  ],
-  rup:[
-    {t:'Accettare “sistema conforme all’AI Act” senza pretendere documentazione verificabile.', cats:['procurement','pnrr']},
-    {t:'Non chiedere log, audit, localizzazione dati, metriche e limiti d’uso.', cats:['procurement','privacy']},
-    {t:'Fare un capitolato sulle funzionalità, non su responsabilità, controlli e aggiornamenti.', cats:['procurement','governance']},
-    {t:'Non prevedere clausole su subfornitori, riuso dei dati e modifiche del modello.', cats:['procurement','privacy']},
-    {t:'Collaudare sul “funziona” senza testare casi limite, escalation e reportistica.', cats:['procurement','chatbot']}
-  ],
-  segreteria:[
-    {t:'Usare strumenti gratuiti con testi reali, matricole e situazioni personali.', cats:['shadow','privacy']},
-    {t:'Far rispondere il chatbot anche su termini, benefici, esclusioni, tasse e reclami.', cats:['chatbot','governance']},
-    {t:'Non salvare le risposte date agli studenti perché “non abbiamo tempo”.', cats:['chatbot','governance']},
-    {t:'Usare l’output IA come comunicazione pronta senza riesame umano.', cats:['shadow','chatbot']},
-    {t:'Non segnalare errori del sistema per evitare altri adempimenti.', cats:['governance','chatbot']}
-  ],
-  it:[
-    {t:'Attivare sistemi senza mappare i procedimenti e i punti in cui incidono.', cats:['governance','procurement']},
-    {t:'Dare account e accessi senza policy, formazione e regole d’uso.', cats:['shadow','privacy']},
-    {t:'Non prevedere log leggibili anche dagli uffici competenti.', cats:['governance','procurement']},
-    {t:'Trattare il problema come solo tecnico, ignorando effetti amministrativi.', cats:['governance']},
-    {t:'Non sapere quali strumenti IA gli uffici stanno già usando.', cats:['shadow','governance']}
-  ],
-  dpo:[
-    {t:'Essere coinvolta solo a contratto già firmato e sistema già configurato.', cats:['privacy','governance']},
-    {t:'Limitarsi a dire “serve DPIA” senza indicare condizioni operative.', cats:['privacy','governance']},
-    {t:'Non distinguere uso di supporto, uso decisionale e profilazione.', cats:['privacy','profilazione']},
-    {t:'Non presidiare dati particolari, DSA, disabilità e studenti vulnerabili.', cats:['privacy','profilazione']},
-    {t:'Non chiedere trasparenza verso studenti, candidati e personale.', cats:['privacy','chatbot']}
-  ],
-  docenti:[
-    {t:'Usare anti-AI writing come prova definitiva contro uno studente.', cats:['valutazione','privacy']},
-    {t:'Far sintetizzare all’IA giudizi qualitativi, prove artistiche o portfolio.', cats:['valutazione']},
-    {t:'Usare IA per ordinare candidati, elaborati o portfolio senza regole comuni.', cats:['valutazione','governance']},
-    {t:'Non dichiarare l’uso di strumenti IA nei lavori di commissione.', cats:['valutazione','shadow']},
-    {t:'Considerare la valutazione didattica fuori dalla governance dell’ente.', cats:['valutazione','governance']}
-  ]
-};
-
-const CRISES = {
-  pnrr:{title:'Crisi PNRR · Fornitore opaco e collaudo impossibile', text:'Il progetto finanziato è partito rapidamente. Il fornitore prometteva una piattaforma AI “chiavi in mano”, ma al collaudo non consegna log comprensibili, metriche di accuratezza, istruzioni d’uso complete né dettagli sugli aggiornamenti del modello. La Direzione deve rendicontare, il RUP chiede documentazione, gli uffici hanno già iniziato a usare il sistema.', lines:{direzione:'Non possiamo perdere il finanziamento.',rup:'Non posso collaudare una scatola nera.',segreteria:'Ma noi lo stiamo già usando.',it:'Non abbiamo controllo tecnico sufficiente.',dpo:'Non so dove finiscono i dati.',docenti:'Nessuno ci ha chiesto se impatta le valutazioni.'}},
-  procurement:{title:'Crisi acquisti · La scatola nera era nel capitolato', text:'Il contratto parla molto di funzionalità e pochissimo di log, audit, dati, aggiornamenti, subfornitori, limiti d’uso e casi di blocco. Ora l’ente deve gestire contestazioni e non ha gli strumenti contrattuali per pretendere spiegazioni tecniche.', lines:{direzione:'Avevamo bisogno di partire.',rup:'Se non viene chiesto prima, dopo non arriva.',segreteria:'A noi serviva uno strumento, non un trattato.',it:'La documentazione tecnica è insufficiente.',dpo:'Mancano garanzie sul trattamento.',docenti:'E noi come motiviamo gli esiti?'}},
-  shadow:{title:'Crisi Shadow AI · Tutti usavano qualcosa', text:'Si scopre che più uffici usano strumenti AI gratuiti o non autorizzati per riscrivere email, riassumere documenti, preparare FAQ e sintetizzare richieste degli studenti. Alcuni prompt contenevano dati reali, matricole, situazioni personali e bozze di atti interni. Nessuno sa quanti strumenti siano in uso.', lines:{direzione:'Perché nessuno ha chiesto una policy prima?',rup:'Questi strumenti non sono neanche in contratto.',segreteria:'Lo facevamo per lavorare meglio.',it:'Non lo sapevamo e non abbiamo log.',dpo:'Questo è un trattamento fuori controllo.',docenti:'Anche noi usiamo tool simili per la didattica.'}},
-  chatbot:{title:'Crisi chatbot · FAQ diventate procedimento', text:'Il chatbot, nato per orientamento e FAQ, ha iniziato a rispondere anche su scadenze, benefici, ammissioni, tasse e reclami. Alcuni studenti hanno seguito risposte errate. L’ente riceve contestazioni e richieste di riesame.', lines:{direzione:'Era un progetto strategico.',rup:'Il contratto non disciplina escalation e responsabilità.',segreteria:'Avevamo bisogno di alleggerire il front office.',it:'Non erano previsti questi casi d’uso.',dpo:'Mancano trasparenza e base informativa chiara.',docenti:'Ora ricade anche sulle procedure didattiche.'}},
-  valutazione:{title:'Crisi valutazione · Il supporto è diventato prova', text:'Una commissione ha usato un tool anti-AI writing o un sistema di sintesi automatica per supportare la valutazione di elaborati, prove artistiche o candidature. Uno studente contesta l’esito, chiede accesso agli atti e vuole sapere quale peso abbia avuto il sistema IA nella valutazione.', lines:{direzione:'Serve una risposta istituzionale.',rup:'Non abbiamo contratto né documentazione.',segreteria:'La contestazione arriva comunque a noi.',it:'Il tool non è autorizzato.',dpo:'Che dati sono stati trattati?',docenti:'Era solo un supporto.'}},
-  profilazione:{title:'Crisi profilazione · Lo studente diventa un’etichetta', text:'L’ente usa un sistema predittivo per individuare studenti “a rischio abbandono” e indirizzarli verso servizi di supporto. Alcuni studenti scoprono di essere stati classificati e contestano il trattamento, temendo stigma e conseguenze sulla carriera.', lines:{direzione:'La finalità era inclusiva.',rup:'Il fornitore non ha dato metriche e bias test.',segreteria:'Non sappiamo come spiegare la classificazione.',it:'Il modello usa dati storici e pattern complessi.',dpo:'La finalità positiva non elimina il rischio.',docenti:'Non vogliamo etichette sugli studenti.'}},
-  governance:{title:'Crisi governance · Il tavolo è arrivato dopo il disastro', text:'Ogni ufficio ha fatto una scelta ragionevole per il proprio pezzo. Sommate insieme, quelle scelte hanno prodotto un sistema senza ruoli chiari, senza escalation, senza log adeguati, senza policy e senza una linea di responsabilità difendibile.', lines:{direzione:'Qualcuno doveva portarmi soluzioni, non solo problemi.',rup:'Io compro ciò che l’ente mi chiede di comprare.',segreteria:'Io gestisco l’emergenza quotidiana.',it:'Non posso governare strumenti che non conosco.',dpo:'Mi avete chiamata quando era già tutto deciso.',docenti:'La didattica non può essere trattata come back office.'}}
-};
-
-const POLLS = {
-  blame:{multi:false, q:'Di chi è la colpa? Scegli la risposta più seducente ma pericolosa.', opts:['Del fornitore: aveva promesso conformità e automazione sicura','Dell’ufficio che lo usava: doveva arrangiarsi meglio','Dell’IT: doveva bloccare tutto prima','Del DPO: doveva avvisare dei rischi','Della Direzione: ha spinto troppo sull’innovazione','Di tutti: ogni silos ha scaricato un pezzo di rischio sugli altri'], correct:[0.25,0,0.25,0.25,0.5,1]},
-  silo:{multi:false, q:'Quale silos ha creato davvero il disastro?', opts:['Direzione senza governance','Acquisti senza requisiti','Tecnologia senza procedimento','Privacy/compliance coinvolta troppo tardi','Didattica/commissioni fuori perimetro','Tutti i precedenti'], correct:[0.5,0.5,0.5,0.5,0.5,1]},
-  stop:{multi:true, max:3, q:'Basta silos. Quali tre cose smettiamo di fare da domani?', opts:['Usare strumenti AI non autorizzati con dati reali','Acquistare AI senza requisiti su log, audit, dati, limiti e aggiornamenti','Far rispondere chatbot su diritti, termini, benefici o esclusioni senza escalation','Usare output AI come motivazione, prova o valutazione definitiva','Coinvolgere DPO, IT, RUP e responsabili procedimento solo alla fine','Confondere supporto, automazione e decisione','Misurare l’innovazione solo su velocità e riduzione dei ticket','Lasciare ogni ufficio libero di sperimentare da solo'], correct:[1,1,1,1,1,1,1,1]}
-};
-
-function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
-function root(path=''){ return ref(db, ROOT + (path?'/'+path:'')); }
-function now(){return Date.now();}
-function getScoreColor(score,pct=60){ if(score>=1) return `rgba(45,106,79,${pct/100*.5+.15})`; if(score>=.5) return `rgba(201,125,46,${pct/100*.4+.12})`; return `rgba(192,57,43,${pct/100*.4+.1})`; }
-function roleName(r){return ROLES[r]?.name || r || 'Gruppo';}
-
-const params = new URLSearchParams(window.location.search);
-if(params.get('facilitatore')==='AA2026'){ isFacilitatore=true; myRole='facilitatore'; startApp(); }
-else if(params.get('proiettore')==='true'){ isProiettore=true; startProjector(); }
-
-window.showRoleScreen = function(){ document.getElementById('screen-landing').classList.add('hidden'); document.getElementById('screen-join').classList.remove('hidden'); };
-window.selectRole = function(role){ myRole=role; document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected')); document.getElementById('btn-'+role)?.classList.add('selected'); document.getElementById('join-btn').disabled=false; };
-window.joinSession = async function(){ if(!myRole) return; await set(root(`presenze/${myId}`),{role:myRole, at:serverTimestamp()}); startApp(); };
-
-function startApp(){
-  document.getElementById('screen-landing').classList.add('hidden');
-  document.getElementById('screen-join').classList.add('hidden');
-  document.getElementById('screen-main').style.display='flex';
-  if(!isFacilitatore){ document.getElementById('tctrls').style.display='none'; }
-  listenSession();
-  if(isFacilitatore) listenFac();
-}
-function startProjector(){
-  document.getElementById('screen-landing').classList.add('hidden');
-  document.getElementById('screen-join').classList.add('hidden');
-  document.getElementById('screen-proj').style.display='flex';
-  listenProjector();
-}
-
-function defaultSession(){ return {phase:0,timerTotal:PHASES[0].mins*60,timerEnd:now()+PHASES[0].mins*60000,timerPaused:false,crisis:null,createdAt:serverTimestamp()}; }
-async function ensureSession(){ const s=await get(root('session')); if(!s.exists()) await set(root('session'), defaultSession()); }
-
-function listenSession(){
-  onValue(root('session'), snap=>{
-    const data=snap.val();
-    document.getElementById('conn-st').className='conn-st'; document.getElementById('conn-st').textContent='●';
-    if(!data){ if(isFacilitatore) ensureSession(); return; }
-    currentPhase=data.phase||0; renderShell(); renderFacPanel(data); renderPhase(currentPhase,data); syncTimer(data);
-  },()=>{document.getElementById('conn-st').className='conn-st off';});
-  ensureSession();
-}
-
-function renderShell(){
-  document.getElementById('phase-ind').textContent='FASE '+(currentPhase+1);
-  document.getElementById('phase-nm').textContent=PHASES[currentPhase]?.name || '';
-  document.getElementById('phases-bar').innerHTML=PHASES.map((p,i)=>`<div class="ptab ${i===currentPhase?'active':''} ${i<currentPhase?'done':''}"><span class="tt">${String(i+1).padStart(2,'0')}</span>${esc(p.name)}</div>`).join('');
-}
-
-function renderFacPanel(session){
-  const el=document.getElementById('fac-panel');
-  if(!isFacilitatore){el.classList.add('hidden');return;}
-  el.classList.remove('hidden');
-  el.innerHTML=`<h3>Pannello facilitatrice</h3><div class="nav-btns">
-    <button class="nbtn" onclick="goPhase(${Math.max(0,currentPhase-1)})">← Indietro</button>
-    <button class="nbtn pri" onclick="goPhase(${Math.min(PHASES.length-1,currentPhase+1)})">Avanti →</button>
-    <button class="nbtn" onclick="timerToggle()" id="timer-toggle">Pausa/Riprendi</button>
-    <button class="nbtn" onclick="timerReset()">Reset timer</button>
-    <button class="nbtn" onclick="computeCrisis(true)">Genera/aggiorna crisi</button>
-    <button class="nbtn danger" onclick="resetLab()">Reset laboratorio</button>
-  </div>
-  <div class="stats-grid" id="fac-stats"><div class="stat"><div class="n">–</div><div class="l">gruppi</div></div></div>`;
-}
-
-function listenFac(){
-  onValue(root('presenze'), snap=>{
-    const val=snap.val()||{}; const counts={}; Object.values(val).forEach(v=>{counts[v.role]=(counts[v.role]||0)+1});
-    const tot=Object.keys(val).length;
-    const stats=document.getElementById('fac-stats'); if(stats) stats.innerHTML=`<div class="stat"><div class="n">${tot}</div><div class="l">gruppi</div></div>`+Object.entries(ROLES).map(([k,r])=>`<div class="stat"><div class="n">${counts[k]||0}</div><div class="l">${esc(r.badge)}</div></div>`).join('');
-  });
-}
-
-const CIRC=2*Math.PI*20;
-function syncTimer(data){
-  clearInterval(timerInterval);
-  const total=data.timerTotal||120, end=data.timerEnd||now(), paused=data.timerPaused, pausedAt=data.timerPausedAt;
-  function upd(){
-    let rem=paused&&pausedAt?Math.max(0,Math.round((end-pausedAt)/1000)):Math.max(0,Math.round((end-now())/1000));
-    const m=Math.floor(rem/60), s=rem%60;
-    document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}`;
-    const circle=document.getElementById('timer-circle'); circle.style.strokeDashoffset=CIRC*(1-rem/total); circle.classList.toggle('urgent',rem<=45&&rem>0);
-  }
-  upd(); if(!paused) timerInterval=setInterval(upd,500);
-}
-window.goPhase=async function(p){ await set(root('session'),{phase:p,timerTotal:PHASES[p].mins*60,timerEnd:now()+PHASES[p].mins*60000,timerPaused:false,crisis:(await get(root('session/crisis'))).val()||null}); };
-window.timerReset=async function(){ const p=currentPhase; const s=(await get(root('session'))).val()||{}; await set(root('session'),{...s, phase:p,timerTotal:PHASES[p].mins*60,timerEnd:now()+PHASES[p].mins*60000,timerPaused:false,timerPausedAt:null}); };
-window.timerToggle=async function(){ const s=(await get(root('session'))).val(); if(!s) return; if(s.timerPaused){ const remaining=s.timerEnd-s.timerPausedAt; await set(root('session'),{...s,timerEnd:now()+remaining,timerPaused:false,timerPausedAt:null}); } else { await set(root('session'),{...s,timerPaused:true,timerPausedAt:now()}); }};
-window.resetLab=async function(){ if(!confirm('Azzerare tutto il laboratorio Modulo 4?')) return; await remove(root()); await set(root('session'), defaultSession()); };
-
-function renderPhase(phase,session){
-  if(phase===0) return renderScenario();
-  if(phase===1) return renderDisasterMoves();
-  if(phase===2) return renderCrisis(session);
-  if(phase===3) return renderFight(session);
-  if(phase===4) return renderStopList();
-  return renderReport(session);
-}
-
-function renderScenario(){
-  document.getElementById('content').innerHTML=`<div class="card ambra"><div class="eyebrow">Scenario</div><div class="ctitle">Il tavolo di governance è convocato. Purtroppo.</div><div class="cbody">L’ente deve introdurre strumenti di IA per sportello studenti, ticket, comunicazione, bozze di atti, analisi dati e supporto alle commissioni. La Direzione ha pressione PNRR: fondi, obiettivi, scadenze, rendicontazione e reputazione.</div><div class="quote"><strong>Regola:</strong> per ora potete ragionare a silos. Dovete difendere il vostro ruolo anche in modo un po’ corporativo. Poi torniamo adulti.</div></div>
-  <div class="grid">${Object.entries(ROLES).map(([k,r])=>`<div class="role-mini"><span class="tag t-b">${esc(r.badge)}</span><h3>${esc(r.name)}</h3><p>“${esc(r.line)}”</p></div>`).join('')}</div>`;
-}
-
-function renderDisasterMoves(){
-  if(!myRole || isFacilitatore){
-    document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">Progetta il disastro</div><div class="ctitle">Ogni ruolo sceglie 2 mosse distruttive.</div><div class="cbody">La facilitatrice vede il risultato aggregato. I gruppi selezionano le mosse dal proprio dispositivo.</div><div id="fac-choice-summary" class="mt"></div></div>`;
-    renderChoiceSummary(); return;
-  }
-  const role=ROLES[myRole], moves=MOVES[myRole]||[];
-  document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">${esc(role.name)}</div><div class="ctitle">Scegli 2 mosse per far fallire la governance.</div><div class="cbody">Non scegliere le più corrette: scegli quelle che il tuo ufficio potrebbe fare quando è sotto pressione.</div></div>
-    <div class="card"><div id="move-list">${moves.map((m,i)=>`<div class="choice" id="move-${i}" onclick="toggleMove(${i})">${esc(m.t)}<span class="meta">${m.cats.map(c=>'#'+c).join(' ')}</span></div>`).join('')}</div><button class="save-btn" id="save-moves" onclick="saveMoves()" disabled>Salva mosse-disastro</button><span class="saved-badge" id="saved-moves">salvato ✓</span></div>`;
-}
-window.toggleMove=function(i){ const pos=localChoices.indexOf(i); if(pos>=0) localChoices.splice(pos,1); else if(localChoices.length<2) localChoices.push(i); document.querySelectorAll('.choice').forEach((el,idx)=>{el.classList.toggle('selected',localChoices.includes(idx)); el.classList.toggle('disabled',localChoices.length>=2&&!localChoices.includes(idx));}); document.getElementById('save-moves').disabled=localChoices.length!==2; };
-window.saveMoves=async function(){ const moves=MOVES[myRole]||[]; const cats=[]; localChoices.forEach(i=>cats.push(...moves[i].cats)); await set(root(`choices/${myId}`),{role:myRole, choices:localChoices.map(i=>moves[i].t), cats, at:serverTimestamp()}); document.getElementById('saved-moves')?.classList.add('show'); };
-
-function renderChoiceSummary(){
-  onValue(root('choices'), snap=>{
-    const val=snap.val()||{}; const counts={}; const byRole={};
-    Object.values(val).forEach(v=>{ byRole[v.role]=(byRole[v.role]||0)+1; (v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1); });
-    const el=document.getElementById('fac-choice-summary'); if(!el) return;
-    el.innerHTML=`<div class="stats-grid"><div class="stat"><div class="n">${Object.keys(val).length}</div><div class="l">gruppi hanno scelto</div></div>${Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">#${esc(k)}</div></div>`).join('')}</div>`;
-  });
-}
-
-async function determineCrisis(){
-  const snap=await get(root('choices')); const val=snap.val()||{}; const counts={};
-  Object.values(val).forEach(v=>(v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1));
-  const mapping=[['pnrr','pnrr'],['procurement','procurement'],['shadow','shadow'],['chatbot','chatbot'],['valutazione','valutazione'],['profilazione','profilazione'],['governance','governance'],['privacy','profilazione']];
-  let best='governance', bestN=-1;
-  mapping.forEach(([cat,cr])=>{ const n=counts[cat]||0; if(n>bestN){best=cr; bestN=n;} });
-  return best;
-}
-window.computeCrisis=async function(force=false){ const cr=await determineCrisis(); const s=(await get(root('session'))).val()||defaultSession(); if(force || !s.crisis){ await set(root('session'),{...s, crisis:cr}); } return cr; };
-
-async function renderCrisis(session){
-  let cid=session?.crisis; if(!cid && isFacilitatore) cid=await window.computeCrisis(false); if(!cid) cid='governance'; const c=CRISES[cid];
-  document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">Crisi dinamica</div><div class="crisis-title">${esc(c.title)}</div><div class="crisis-box">${esc(c.text)}</div></div>
-  <div class="card ambra"><div class="eyebrow">Benzina sul fuoco</div><div class="ctitle">Ora difendete il vostro silos.</div><div class="cbody">Per qualche minuto potete essere ingenerosi, corporativi e difensivi. Poi ricomponiamo.</div><div class="mt">${Object.entries(c.lines).map(([r,l])=>`<div class="fight-line"><strong>${esc(roleName(r))}:</strong> “${esc(l)}”</div>`).join('')}</div></div>
-  ${mkPoll('blame')}`;
-  listenPoll('blame');
-}
-
-function renderFight(session){
-  const cid=session?.crisis||'governance'; const c=CRISES[cid];
-  document.getElementById('content').innerHTML=`<div class="card ambra"><div class="eyebrow">Litighiamo bene</div><div class="ctitle">La domanda non è solo “di chi è la colpa”.</div><div class="cbody">La domanda vera è: quale pezzo dell’organizzazione ha ragionato come se fosse solo?</div><div class="quote"><strong>Frase guida:</strong> Il rischio AI non è tecnico, privacy, contrattuale o didattico. È tutte queste cose insieme.</div></div>${mkPoll('silo')}`;
-  listenPoll('silo');
-}
-
-function renderStopList(){
-  document.getElementById('content').innerHTML=`<div class="card verde"><div class="eyebrow">Stop Doing List</div><div class="ctitle">Ora smettiamo di difenderci.</div><div class="cbody">Scegliete massimo tre comportamenti che l’ente deve interrompere da domani. Non sono buoni propositi: sono divieti organizzativi minimi.</div></div>${mkPoll('stop')}`;
-  listenPoll('stop');
-}
-
-function mkPoll(pid){ const p=POLLS[pid]; if(!p) return ''; return `<div class="card"><div class="eyebrow">Votazione</div><div class="ctitle">${esc(p.q)}</div><div id="poll-${pid}">${p.opts.map((o,i)=>`<div class="poll-opt" id="${pid}-${i}" onclick="vote('${pid}',${i})"><div class="pbar"></div><div class="poc"><span class="plabel">${esc(o)}</span><span><span class="ppct"></span><span class="pcnt"></span></span></div></div>`).join('')}</div><button class="save-btn" onclick="submitVote('${pid}')">Invia voto</button><span class="saved-badge" id="saved-${pid}">salvato ✓</span></div>`; }
-window.vote=function(pid,i){ const p=POLLS[pid]; localVotes[pid]=localVotes[pid]||[]; if(!p.multi) localVotes[pid]=[i]; else { const arr=localVotes[pid]; const pos=arr.indexOf(i); if(pos>=0) arr.splice(pos,1); else if(!p.max || arr.length<p.max) arr.push(i); } p.opts.forEach((_,idx)=>{ const el=document.getElementById(`${pid}-${idx}`); if(el) el.classList.toggle('sel',(localVotes[pid]||[]).includes(idx));}); };
-window.submitVote=async function(pid){ const arr=localVotes[pid]||[]; if(arr.length===0) return; await set(root(`polls/${pid}/voters/${myId}`),{role:myRole||'facilitatore', votes:arr, at:serverTimestamp()}); document.getElementById('saved-'+pid)?.classList.add('show'); };
-function listenPoll(pid){
-  onValue(root(`polls/${pid}/voters`), snap=>{ const voters=snap.val()||{}; const p=POLLS[pid]; const counts=Array(p.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>{counts[i]=(counts[i]||0)+1;})); const total=Object.keys(voters).length || 0; p.opts.forEach((_,i)=>{ const el=document.getElementById(`${pid}-${i}`); if(!el) return; const pct=total?Math.round((counts[i]/total)*100):0; const score=(p.correct||[])[i] ?? 0; const bar=el.querySelector('.pbar'); bar.style.width=pct+'%'; bar.style.background=getScoreColor(score,pct); el.querySelector('.ppct').textContent=pct+'%'; el.querySelector('.pcnt').textContent=` ${counts[i]||0}`; }); });
-}
-
-async function renderReport(session){
-  const crisis=CRISES[session?.crisis||'governance'];
-  document.getElementById('content').innerHTML=`<div class="report"><h3>Report finale · Stop Doing List del tavolo</h3><p class="small mb"><strong>Crisi generata:</strong> ${esc(crisis.title)}</p><div id="report-stop"><p class="small">Caricamento risultati…</p></div><button class="report-btn" onclick="downloadReport()">Scarica report .txt</button></div>`;
-  const snap=await get(root('polls/stop/voters')); const voters=snap.val()||{}; const counts=Array(POLLS.stop.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++));
-  const top=counts.map((n,i)=>({n,i,t:POLLS.stop.opts[i]})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0).slice(0,5);
-  document.getElementById('report-stop').innerHTML=`<h3>Da domani smettiamo di:</h3><ul>${top.map(x=>`<li>${esc(x.t)} <span class="small">(${x.n} voti)</span></li>`).join('') || '<li>nessun voto registrato</li>'}</ul><h3 class="mt">Tavolo minimo da convocare prima dell’adozione</h3><ul><li>Direzione / governance</li><li>Responsabile del procedimento e ufficio utilizzatore</li><li>IT / RTD</li><li>DPO / privacy / compliance</li><li>RUP / DEC / acquisti</li><li>Ufficio legale, se il caso incide su atti o contenzioso</li><li>Docenti / commissioni, se impatta didattica, ammissioni o valutazione</li></ul>`;
-}
-window.downloadReport=async function(){ const s=(await get(root('session'))).val()||{}; const crisis=CRISES[s.crisis||'governance']; const snap=await get(root('polls/stop/voters')); const voters=snap.val()||{}; const counts=Array(POLLS.stop.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++)); const top=counts.map((n,i)=>({n,i,t:POLLS.stop.opts[i]})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0); let txt=`AI Disaster Board - Modulo 4\nAvv.ta Adriana Augenti - Avvocata\n\nCRISI: ${crisis.title}\n${crisis.text}\n\nSTOP DOING LIST\n`; top.forEach((x,idx)=>txt+=`${idx+1}. ${x.t} (${x.n} voti)\n`); txt+='\nTAVOLO MINIMO\n- Direzione / governance\n- Responsabile procedimento e ufficio utilizzatore\n- IT / RTD\n- DPO / privacy / compliance\n- RUP / DEC / acquisti\n- Ufficio legale se rilevante\n- Docenti / commissioni se impatta didattica o valutazione\n'; const blob=new Blob([txt],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AI_Disaster_Board_report.txt'; a.click(); URL.revokeObjectURL(a.href); };
-
-function listenProjector(){
-  onValue(root('session'), snap=>{ const s=snap.val(); if(!s) return; const phase=s.phase||0; document.getElementById('proj-phase-label').textContent='FASE '+(phase+1); document.getElementById('proj-phase-name').textContent=PHASES[phase]?.name||''; syncProjTimer(s,phase); });
-}
-function syncProjTimer(s,phase){
-  clearInterval(projTimerInterval); const total=s.timerTotal||120,end=s.timerEnd||now(),paused=s.timerPaused,pausedAt=s.timerPausedAt; const el=document.getElementById('proj-timer'); const results=document.getElementById('proj-results'); const help=document.getElementById('proj-help');
-  function upd(){ let rem=paused&&pausedAt?Math.max(0,Math.round((end-pausedAt)/1000)):Math.max(0,Math.round((end-now())/1000)); const m=Math.floor(rem/60), sec=rem%60; el.textContent=`${m}:${String(sec).padStart(2,'0')}`; el.classList.toggle('urgent',rem<=45&&rem>0); if(rem===0){clearInterval(projTimerInterval); help.style.display='none'; results.style.display='block'; showProjectorResults(phase,s);} else {help.style.display='block'; results.style.display='none';}}
-  upd(); if(!paused) projTimerInterval=setInterval(upd,500);
-}
-async function showProjectorResults(phase,s){ const results=document.getElementById('proj-results'); results.innerHTML=''; if(phase===1){ const snap=await get(root('choices')); const val=snap.val()||{}; const counts={}; Object.values(val).forEach(v=>(v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1)); const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]); const total=Math.max(1,...entries.map(e=>e[1])); results.innerHTML=`<div class="proj-help">Categorie disastro più votate</div>`+entries.map(([k,n])=>`<div class="proj-opt"><div class="proj-bar" style="width:${Math.round(n/total*100)}%;background:rgba(201,125,46,.45)"></div><div class="proj-oc"><span class="proj-label">#${esc(k)}</span><span class="proj-pct">${n}</span></div></div>`).join(''); return; }
-  if(phase===2){ const c=CRISES[s.crisis||'governance']; results.innerHTML=`<div class="proj-help"><strong>${esc(c.title)}</strong><br>${esc(c.text)}</div>`; await showPollProj('blame',results); return; }
-  if(phase===3){ await showPollProj('silo',results); return; }
-  if(phase===4 || phase===5){ await showPollProj('stop',results); return; }
-  results.innerHTML='<div class="proj-help">Il tavolo di governance è convocato. Purtroppo.</div>'; }
-async function showPollProj(pid,container){ const p=POLLS[pid]; const snap=await get(root(`polls/${pid}/voters`)); const voters=snap.val()||{}; const counts=Array(p.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++)); const total=Object.keys(voters).length||0; container.innerHTML += `<div class="proj-help">${esc(p.q)}</div>` + p.opts.map((o,i)=>{ const pct=total?Math.round(counts[i]/total*100):0; const score=(p.correct||[])[i]??1; return `<div class="proj-opt"><div class="proj-bar" style="width:${pct}%;background:${getScoreColor(score,pct)}"></div><div class="proj-oc"><span class="proj-label">${esc(o)}</span><span class="proj-pct">${pct}%</span></div></div>`; }).join(''); }
+window.addEventListener('message', (e) => {
+    if (e.data.type === 'STATE_UPDATE') {
+        state = e.data.state;
+        groups = e.data.groups;
+        myId = e.data.myId;
+        myRole = e.data.myRole;
+        isFacilitatore = e.data.isFacilitatore;
+        render();
+    }
+});
 
 </script>
 </body>
