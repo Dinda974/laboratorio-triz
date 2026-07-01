@@ -1188,10 +1188,13 @@ let myRole = null;
 let isFac = false;
 let isProj = false;
 let currentPhase = 0;
+let currentTimerEnd = 0;
 let timerInterval = null;
 let groups = {};
 let myVotes = {};
 let myDisaster = null;
+let lastFullData = {};
+let projRevealed = false;
 
 // ── URL PARAMS ──
 const params = new URLSearchParams(window.location.search);
@@ -1239,6 +1242,7 @@ function startParticipant() {
   document.getElementById("screen-main").style.display = "flex";
   document.getElementById("screen-main").style.flexDirection = "column";
   document.getElementById("role-badge").textContent = ROLES[myRole]?.short || myRole;
+  renderPhase(currentPhase);
   listenAll();
 }
 
@@ -1258,14 +1262,16 @@ function listenAll() {
     const el = document.getElementById("conn-st");
     if (el) { el.className = "conn-st"; el.textContent = "●"; }
     if (!data) return;
-    if (data.phase !== undefined && data.phase !== currentPhase) {
-      currentPhase = data.phase;
-      if (!isProj) renderPhase(currentPhase);
+    const phaseChanged = data.phase !== undefined && data.phase !== currentPhase;
+    if (phaseChanged) currentPhase = data.phase;
+    const timerStartChanged = isFac && (data.timerEnd || 0) !== currentTimerEnd;
+    currentTimerEnd = data.timerEnd || 0;
+    lastFullData = data;
+    if (!isProj && (phaseChanged || timerStartChanged)) renderPhase(currentPhase);
+    if (data.timerEnd !== undefined && data.timerTotal !== undefined) {
+      syncTimer(data.timerEnd || 0, data.timerTotal, data.timerPaused || false, data.timerPausedAt || null);
     }
-    if (data.timerEnd && data.timerTotal !== undefined) {
-      syncTimer(data.timerEnd, data.timerTotal, data.timerPaused || false, data.timerPausedAt || null);
-    }
-    if (isProj) renderProjector(data, snap.val() || {});
+    if (isProj) renderProjector(data, data);
   }, () => {
     const el = document.getElementById("conn-st");
     if (el) { el.className = "conn-st off"; el.textContent = "●"; }
@@ -1332,6 +1338,10 @@ function syncTimer(timerEnd, timerTotal, paused, pausedAt) {
       projT.className = "proj-timer" + (rem <= 60 && rem > 0 && !paused ? " urgent" : "");
       projT.style.display = (timerEnd > 0 && !paused) ? "block" : "none";
     }
+    if (isProj && timerEnd > 0 && !paused && rem <= 0 && !projRevealed) {
+      projRevealed = true;
+      renderProjector(lastFullData, lastFullData);
+    }
   }
   update();
   if (timerEnd > 0) timerInterval = setInterval(update, 500);
@@ -1341,9 +1351,8 @@ window.goToPhase = async function(phase) {
   if (!isFac) return;
   currentPhase = phase;
   const dur = PHASE_DUR[phase];
-  const timerEnd = dur > 0 ? Date.now() + dur * 1000 : 0;
   await set(ref(db, "session"), {
-    phase, timerEnd, timerTotal: dur,
+    phase, timerEnd: 0, timerTotal: dur,
     timerPaused: false, timerPausedAt: null, showResults: false
   });
   renderPhase(phase);
@@ -1596,7 +1605,7 @@ function facPanel(prev, next, prevLabel, nextLabel) {
     <div class="nav-btns">
       ${prev !== null ? `<button class="nbtn" onclick="goToPhase(${prev})">← ${prevLabel}</button>` : ""}
       ${next !== null ? `<button class="nbtn pri" id="fac-next-btn" onclick="goToPhase(${next})">→ ${nextLabel}</button>` : ""}
-      <button class="nbtn" onclick="timerReset()">↺ Timer</button>
+      ${PHASE_DUR[currentPhase] > 0 && currentTimerEnd === 0 ? `<button class="nbtn pri" onclick="timerReset()">▶ Avvia Timer</button>` : PHASE_DUR[currentPhase] > 0 ? `<button class="nbtn" onclick="timerReset()">↺ Timer</button>` : ""}
       ${(currentPhase === 4 || currentPhase === 5) ? `<button class="nbtn" id="fac-stop-btn" onclick="stopAndShow()">Stop e mostra risultati</button>` : ""}
       <button class="nbtn danger" onclick="resetLab()">⚠ Reset</button>
     </div>
@@ -1881,13 +1890,18 @@ function renderPollResults(kind, opts, showVoters) {
 
 // ── PROIETTORE ──
 function renderProjector(sessionData, fullData) {
+  const data = fullData || sessionData || {};
   const phase = sessionData?.phase || 0;
   const pl = document.getElementById("proj-phase-label");
-  const pt = document.getElementById("proj-phase-title"); 
+  const pt = document.getElementById("proj-phase-title");
   const ps = document.getElementById("proj-sub");
   const dyn = document.getElementById("proj-dynamic");
-  if (pl) pl.textContent = "FASE " + (phase + 1);
-  if (pt) pt.textContent = PHASE_NAMES[phase];
+  const dur = PHASE_DUR[phase];
+  const timerEnd = data.timerEnd || 0;
+  const paused = data.timerPaused || false;
+  const started = dur > 0 && timerEnd > 0;
+  const expired = started && !paused && Date.now() >= timerEnd;
+  const counting = started && !expired;
   const subs = [
     "Un ente, sei uffici, un disastro da costruire insieme.",
     "Ogni gruppo sceglie 3 mosse per far fallire la governance AI.",
@@ -1897,8 +1911,26 @@ function renderProjector(sessionData, fullData) {
     "Da domani: cosa smettiamo di fare?",
     "Il report è pronto. Grazie per aver progettato il disastro."
   ];
-  if (ps) ps.textContent = subs[phase] || "";
+
+  if (counting) {
+    projRevealed = false;
+    if (pl) pl.style.display = "none";
+    if (pt) pt.style.display = "none";
+    if (ps) { ps.style.display = "block"; ps.textContent = "Il tempo scorre: in TRIZ ogni scelta nasconde una contraddizione."; }
+    if (dyn) dyn.innerHTML = "";
+    return;
+  }
+
+  if (pl) { pl.style.display = ""; pl.textContent = phase === 0 ? "" : "FASE " + (phase + 1); }
+  if (pt) { pt.style.display = ""; pt.textContent = phase === 0 ? "Progettiamo il Disastro" : PHASE_NAMES[phase]; }
+  if (ps) { ps.style.display = "block"; ps.textContent = phase === 0 ? "Governance IA, PNRR, silos e responsabilità che non si parlano. Per qualche minuto siete autorizzati a fare del vostro peggio." : (subs[phase] || ""); }
   if (!dyn) return;
+
+  if (dur > 0 && !started) {
+    // In attesa che la facilitatrice avvii il timer della fase
+    dyn.innerHTML = "";
+    return;
+  }
 
   if (phase === 0) {
     // Mostra QR
