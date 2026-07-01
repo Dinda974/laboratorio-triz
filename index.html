@@ -1,999 +1,116 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Laboratorio TRIZ · Distruzione Creativa</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Modulo 4 · AI Disaster Board</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
-:root {
-  --blu:#1B3A6B; --blu2:#2A5298; --avorio:#F8F6F1;
-  --ambra:#C97D2E; --verde:#2D6A4F; --rosso:#C0392B;
-  --grigio:#6B7280; --gc:#E8E4DC; --bianco:#FFFFFF;
-  --ombra:0 4px 24px rgba(27,58,107,0.12);
+:root{
+  --blu:#1B3A6B;--blu2:#2A5298;--avorio:#F8F6F1;--ambra:#C97D2E;
+  --verde:#2D6A4F;--rosso:#C0392B;--grigio:#6B7280;--gc:#E8E4DC;
+  --bianco:#FFFFFF;--ombra:0 4px 24px rgba(27,58,107,.12);
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:"IBM Plex Sans",sans-serif;background:var(--avorio);color:var(--blu);min-height:100vh}
+button,input,textarea{font-family:"IBM Plex Sans",sans-serif}
+.hidden{display:none!important}.mono{font-family:"IBM Plex Mono",monospace}.small{font-size:.78rem;color:var(--grigio);line-height:1.5}.mt{margin-top:.8rem}.mb{margin-bottom:.8rem}
 
-/* SCHERMATE */
-.screen{min-height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--blu)}
-.screen.active{display:flex}
-
-/* LANDING */
-.join-logo{font-family:"IBM Plex Mono",monospace;font-size:.7rem;letter-spacing:.25em;color:var(--ambra);text-transform:uppercase;margin-bottom:1rem;text-align:center}
-.info-box{background:rgba(248,246,241,.08);border:1px solid rgba(248,246,241,.15);border-radius:12px;padding:1.1rem 1.4rem;max-width:360px;text-align:center;margin:1.25rem 0}
-.info-box .label{font-size:.75rem;font-weight:700;color:var(--ambra);text-transform:uppercase;letter-spacing:.1em;margin-bottom:.4rem}
-.info-box p{font-size:.88rem;color:rgba(248,246,241,.85);line-height:1.6}
-.cta-btn{background:var(--ambra);color:white;border:none;border-radius:10px;padding:.85rem 2rem;font-family:"IBM Plex Sans",sans-serif;font-size:1rem;font-weight:700;cursor:pointer;transition:background .2s}
-.cta-btn:hover{background:#b56e25}
-
-/* SELEZIONE GRUPPO */
-.join-card{background:var(--avorio);border-radius:16px;padding:2rem;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.join-card h2{font-size:.85rem;font-weight:600;color:var(--grigio);text-transform:uppercase;letter-spacing:.1em;margin-bottom:1rem}
-.group-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:.5rem;margin-bottom:1rem}
-.gbtn{padding:.75rem .5rem;border:2px solid var(--gc);border-radius:9px;background:var(--bianco);cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-size:.85rem;font-weight:600;color:var(--blu);transition:all .2s;text-align:center}
-.gbtn:hover{border-color:var(--blu2)}
-.gbtn.selected{border-color:var(--ambra);background:rgba(201,125,46,.08);color:var(--ambra)}
-.join-btn{width:100%;padding:.9rem;background:var(--blu);color:var(--avorio);border:none;border-radius:10px;font-family:"IBM Plex Sans",sans-serif;font-size:.95rem;font-weight:600;cursor:pointer;margin-top:.5rem;transition:background .2s}
-.join-btn:hover{background:var(--blu2)}
-.join-btn:disabled{opacity:.4;cursor:not-allowed}
-
-/* HEADER */
-header{background:var(--blu);color:var(--avorio);padding:.7rem 1.25rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.2)}
-.hl{display:flex;align-items:center;gap:.75rem}
-.phase-ind{font-family:"IBM Plex Mono",monospace;font-size:.65rem;letter-spacing:.2em;color:var(--ambra);text-transform:uppercase}
-.phase-nm{font-size:.9rem;font-weight:600;color:var(--avorio)}
-.group-badge{font-family:"IBM Plex Mono",monospace;font-size:.7rem;background:rgba(201,125,46,.25);color:var(--ambra);padding:.2rem .6rem;border-radius:6px}
-
-/* TIMER */
-.timer-wrap{display:flex;align-items:center;gap:.6rem}
-.timer-svg-wrap{position:relative;width:48px;height:48px;flex-shrink:0}
-.timer-svg-wrap svg{transform:rotate(-90deg)}
-.timer-track{fill:none;stroke:rgba(248,246,241,.15);stroke-width:4}
-.timer-fill{fill:none;stroke:var(--ambra);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
-.timer-fill.urgent{stroke:var(--rosso);animation:pr 1s ease-in-out infinite}
-@keyframes pr{0%,100%{opacity:1}50%{opacity:.5}}
-.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:600;color:var(--avorio)}
-.tctrls{display:flex;gap:.35rem}
-.tctrl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:var(--avorio);border-radius:6px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer;font-family:"IBM Plex Sans",sans-serif}
-.tctrl:hover{background:rgba(255,255,255,.2)}
-.conn-st{font-family:"IBM Plex Mono",monospace;font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:rgba(45,106,79,.2);color:#86efac}
-.conn-st.off{background:rgba(192,57,43,.2);color:#fca5a5}
-.kbtn{background:transparent;border:2px solid rgba(255,255,255,.3);color:var(--avorio);border-radius:8px;padding:.35rem .8rem;font-size:.82rem;cursor:pointer;font-family:"IBM Plex Sans",sans-serif;font-weight:500;white-space:nowrap}
-.kbtn:hover{background:rgba(255,100,50,.3)}
-.kbtn.sent{background:var(--rosso);border-color:var(--rosso);animation:bounce .4s ease}
-@keyframes bounce{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}
-
-/* FASI BAR */
-.phases-bar{background:var(--bianco);border-bottom:1px solid var(--gc);padding:0 1.25rem;display:flex;overflow-x:auto;scrollbar-width:none}
-.phases-bar::-webkit-scrollbar{display:none}
-.ptab{padding:.65rem 1.1rem;font-size:.78rem;font-weight:500;color:var(--grigio);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
-.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:600}
-.ptab.done{color:var(--verde)}
-.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.62rem;color:var(--grigio);display:block}
+/* LANDING / JOIN */
+.screen-full{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;background:var(--blu)}
+.logo{font-family:"IBM Plex Mono",monospace;font-size:.68rem;letter-spacing:.28em;color:var(--ambra);text-transform:uppercase;margin-bottom:1.25rem;text-align:center}
+.hero-title{font-size:clamp(1.65rem,4vw,3rem);font-weight:700;color:var(--avorio);text-align:center;line-height:1.12;max-width:820px;margin-bottom:.65rem}
+.hero-sub{font-size:1rem;color:rgba(248,246,241,.72);text-align:center;max-width:780px;line-height:1.55;margin-bottom:1.4rem}
+.hero-card{background:rgba(248,246,241,.08);border:1px solid rgba(248,246,241,.16);border-radius:18px;padding:1rem 1.2rem;color:var(--avorio);max-width:760px;line-height:1.55;margin-bottom:1.35rem}
+.hero-card strong{color:var(--ambra)}
+.primary-big{padding:.92rem 1.35rem;background:var(--ambra);color:#fff;border:0;border-radius:10px;font-size:.96rem;font-weight:700;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.primary-big:hover{filter:brightness(1.05)}
+.join-card{background:var(--avorio);border-radius:16px;padding:2rem;width:100%;max-width:560px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.join-card h2{font-size:.78rem;font-weight:700;color:var(--grigio);text-transform:uppercase;letter-spacing:.14em;margin-bottom:1rem;font-family:"IBM Plex Mono",monospace}
+.role-btn{display:block;width:100%;padding:.86rem 1rem;margin-bottom:.62rem;border:2px solid var(--gc);border-radius:10px;background:#fff;cursor:pointer;text-align:left;transition:all .2s}
+.role-btn:hover{border-color:var(--blu2);background:rgba(27,58,107,.035)}.role-btn.selected{border-color:var(--ambra);background:rgba(201,125,46,.07)}
+.role-btn .rn{font-weight:700;font-size:.95rem;color:var(--blu);display:block}.role-btn .rd{font-size:.75rem;color:var(--grigio);margin-top:.2rem;line-height:1.35}
+.join-btn{width:100%;padding:.9rem;background:var(--blu);color:var(--avorio);border:0;border-radius:10px;font-size:.95rem;font-weight:700;cursor:pointer;margin-top:1.1rem}.join-btn:disabled{opacity:.45;cursor:not-allowed}
+.info-box{background:rgba(201,125,46,.1);border:1px solid rgba(201,125,46,.32);border-radius:8px;padding:.82rem;margin-bottom:1rem;font-size:.82rem;line-height:1.5;color:#78450f}
 
 /* MAIN */
-main{flex:1;padding:1.25rem;max-width:780px;margin:0 auto;width:100%}
+#screen-main{display:none;min-height:100vh;flex-direction:column}
+header{background:var(--blu);color:var(--avorio);padding:.7rem 1.15rem;display:flex;align-items:center;justify-content:space-between;gap:1rem;position:sticky;top:0;z-index:50;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+.hl{display:flex;align-items:center;gap:.75rem;min-width:0}.phase-ind{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;color:var(--ambra);text-transform:uppercase;white-space:nowrap}.phase-nm{font-size:.92rem;font-weight:700;color:var(--avorio);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.timer-wrap{display:flex;align-items:center;gap:.55rem}.timer-svg-wrap{position:relative;width:48px;height:48px;flex-shrink:0}.timer-svg-wrap svg{transform:rotate(-90deg)}.timer-track{fill:none;stroke:rgba(248,246,241,.15);stroke-width:4}.timer-fill{fill:none;stroke:var(--ambra);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}.timer-fill.urgent{stroke:var(--rosso);animation:pr 1s ease-in-out infinite}@keyframes pr{0%,100%{opacity:1}50%{opacity:.5}}
+.timer-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-family:"IBM Plex Mono",monospace;font-size:.72rem;font-weight:700;color:var(--avorio)}
+.tctrls{display:flex;gap:.35rem}.tctrl{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:var(--avorio);border-radius:6px;padding:.25rem .55rem;font-size:.78rem;cursor:pointer}.tctrl:hover{background:rgba(255,255,255,.22)}
+.conn-st{font-family:"IBM Plex Mono",monospace;font-size:.6rem;padding:.15rem .4rem;border-radius:4px;background:rgba(45,106,79,.2);color:#86efac}.conn-st.off{background:rgba(192,57,43,.2);color:#fca5a5}
+.phases-bar{background:#fff;border-bottom:1px solid var(--gc);padding:0 1.25rem;display:flex;overflow-x:auto;scrollbar-width:none}.phases-bar::-webkit-scrollbar{display:none}.ptab{padding:.68rem 1.05rem;font-size:.76rem;font-weight:600;color:var(--grigio);border-bottom:3px solid transparent;white-space:nowrap}.ptab.active{color:var(--blu);border-bottom-color:var(--ambra);font-weight:700}.ptab.done{color:var(--verde)}.ptab .tt{font-family:"IBM Plex Mono",monospace;font-size:.58rem;color:var(--grigio);display:block;font-weight:400}
+main{flex:1;padding:1.25rem;max-width:900px;margin:0 auto;width:100%}
+.card{background:#fff;border-radius:12px;padding:1.45rem;margin-bottom:1rem;box-shadow:var(--ombra);border-left:4px solid var(--blu)}.card.ambra{border-left-color:var(--ambra)}.card.verde{border-left-color:var(--verde)}.card.rosso{border-left-color:var(--rosso)}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grigio);margin-bottom:.55rem}.ctitle{font-size:1.12rem;font-weight:800;color:var(--blu);margin-bottom:.65rem;line-height:1.25}.cbody{font-size:.9rem;line-height:1.7;color:#374151}.quote{background:rgba(201,125,46,.09);border:1px solid rgba(201,125,46,.24);border-radius:10px;padding:.9rem 1rem;line-height:1.6;margin-top:.9rem;color:#68400f}.quote strong{color:var(--ambra)}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:.75rem}.role-mini{border:2px solid var(--gc);background:#fff;border-radius:12px;padding:1rem}.role-mini h3{font-size:.9rem;color:var(--blu);margin-bottom:.35rem}.role-mini p{font-size:.78rem;color:#4b5563;line-height:1.45}.tag{display:inline-block;padding:.18rem .55rem;border-radius:4px;font-size:.66rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}.t-r{background:rgba(192,57,43,.1);color:var(--rosso)}.t-a{background:rgba(201,125,46,.12);color:var(--ambra)}.t-b{background:rgba(27,58,107,.1);color:var(--blu)}.t-v{background:rgba(45,106,79,.1);color:var(--verde)}
+.choice{position:relative;padding:.85rem .95rem;border:2px solid var(--gc);border-radius:10px;background:#fff;margin-bottom:.55rem;cursor:pointer;transition:all .18s;line-height:1.45;color:#374151}.choice:hover{border-color:var(--blu2);background:rgba(27,58,107,.035)}.choice.selected{border-color:var(--ambra);background:rgba(201,125,46,.08)}.choice.disabled{opacity:.52;cursor:not-allowed}.choice .meta{display:block;margin-top:.25rem;font-size:.68rem;color:var(--grigio);font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.07em}.save-btn{margin-top:.65rem;padding:.55rem 1.1rem;background:var(--blu);color:var(--avorio);border:0;border-radius:8px;font-size:.83rem;font-weight:700;cursor:pointer}.save-btn:hover{background:var(--blu2)}.save-btn:disabled{opacity:.45;cursor:not-allowed}.saved-badge{display:inline-block;margin-left:.55rem;font-size:.76rem;color:var(--verde);font-weight:700;opacity:0;transition:opacity .3s}.show{opacity:1!important}
+.poll-opt{position:relative;padding:.82rem .95rem;border:2px solid var(--gc);border-radius:10px;cursor:pointer;background:#fff;overflow:hidden;margin-bottom:.52rem;transition:all .2s}.poll-opt:hover{border-color:var(--blu2)}.poll-opt.sel{border-color:var(--ambra);background:rgba(201,125,46,.06)}.poll-opt.locked{cursor:default}.pbar{position:absolute;left:0;top:0;bottom:0;width:0%;z-index:0;transition:width .6s ease,background .6s ease}.poc{position:relative;z-index:1;display:flex;justify-content:space-between;gap:.75rem;align-items:center}.plabel{font-size:.86rem;line-height:1.35;color:#374151}.ppct{font-family:"IBM Plex Mono",monospace;font-size:.78rem;font-weight:800;min-width:42px;text-align:right}.pcnt{font-size:.68rem;color:var(--grigio)}
+.fac-panel{background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.13);border-radius:10px;padding:1rem;margin-bottom:1rem}.fac-panel h3{font-size:.68rem;text-transform:uppercase;letter-spacing:.15em;color:var(--grigio);font-family:"IBM Plex Mono",monospace;margin-bottom:.8rem}.nav-btns{display:flex;gap:.55rem;flex-wrap:wrap}.nbtn{padding:.5rem .88rem;border-radius:7px;border:2px solid var(--blu);background:transparent;color:var(--blu);font-size:.8rem;font-weight:700;cursor:pointer}.nbtn:hover{background:var(--blu);color:var(--avorio)}.nbtn.pri{background:var(--blu);color:var(--avorio)}.nbtn.danger{border-color:var(--rosso);color:var(--rosso)}.nbtn.danger:hover{background:var(--rosso);color:#fff}
+.stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-top:.85rem}.stat{background:#fff;border:1px solid var(--gc);border-radius:8px;padding:.55rem;text-align:center}.stat .n{font-family:"IBM Plex Mono",monospace;font-size:1.25rem;font-weight:800;color:var(--blu)}.stat .l{font-size:.62rem;color:var(--grigio);margin-top:.12rem}
+.crisis-title{font-size:1.25rem;font-weight:800;color:var(--rosso);margin-bottom:.55rem}.crisis-box{background:rgba(192,57,43,.07);border:1px solid rgba(192,57,43,.25);border-radius:12px;padding:1rem;line-height:1.65;color:#3f1c18}.fight-line{padding:.65rem .75rem;background:#fff;border-radius:8px;border-left:3px solid var(--ambra);margin-bottom:.45rem;font-size:.84rem;line-height:1.45;color:#374151}.fight-line strong{color:var(--blu)}
+textarea{width:100%;min-height:92px;border:2px solid var(--gc);border-radius:8px;padding:.75rem;font-size:.88rem;color:var(--blu);background:var(--avorio);resize:vertical;margin-top:.65rem}textarea:focus{outline:none;border-color:var(--ambra)}
+.report{background:#fff;border-radius:12px;padding:1.2rem;box-shadow:var(--ombra);border-top:4px solid var(--verde)}.report h3{font-size:1rem;margin-bottom:.55rem}.report ul{padding-left:1.1rem;line-height:1.65;color:#374151;font-size:.88rem}.report-btn{display:block;width:100%;padding:1rem;background:var(--verde);color:#fff;border:0;border-radius:10px;font-size:.98rem;font-weight:800;cursor:pointer;margin-top:1rem}.report-btn:hover{background:#1e4d38}
+footer{text-align:center;padding:1.1rem;font-size:.72rem;color:var(--grigio);border-top:1px solid var(--gc);margin-top:1.4rem;font-family:"IBM Plex Mono",monospace;letter-spacing:.04em}
 
-/* CARDS */
-.card{background:var(--bianco);border-radius:12px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--ombra);border-left:4px solid var(--blu)}
-.card.ambra{border-left-color:var(--ambra)}
-.card.verde{border-left-color:var(--verde)}
-.card.rosso{border-left-color:var(--rosso)}
-.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--grigio);margin-bottom:.6rem}
-.ctitle{font-size:1.05rem;font-weight:700;color:var(--blu);margin-bottom:.65rem;line-height:1.3}
-.cbody{font-size:.875rem;line-height:1.7;color:#374151}
-
-/* DOMANDA PROVOCATORIA */
-.provocazione{background:rgba(192,57,43,.06);border:2px solid rgba(192,57,43,.2);border-radius:12px;padding:1.25rem;margin-bottom:1rem}
-.provocazione .emoji{font-size:2rem;margin-bottom:.5rem;display:block}
-.provocazione p{font-size:1rem;font-weight:600;color:var(--rosso);line-height:1.5}
-
-/* TEXTAREA */
-.answer-area{width:100%;min-height:120px;border:2px solid var(--gc);border-radius:8px;padding:.75rem;font-family:"IBM Plex Sans",sans-serif;font-size:.875rem;color:var(--blu);background:var(--avorio);resize:vertical;transition:border-color .2s;margin-top:.75rem;line-height:1.6}
-.answer-area:focus{outline:none;border-color:var(--ambra)}
-.answer-area:read-only{background:rgba(27,58,107,.03);color:var(--grigio);cursor:default}
-.save-btn{margin-top:.5rem;padding:.5rem 1.1rem;background:var(--blu);color:var(--avorio);border:none;border-radius:7px;font-family:"IBM Plex Sans",sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:background .2s}
-.save-btn:hover{background:var(--blu2)}
-.save-btn:disabled{opacity:.4;cursor:not-allowed}
-.saved-ok{font-size:.75rem;color:var(--verde);font-weight:600;margin-left:.5rem;display:inline-block;opacity:0;transition:opacity .3s}
-
-/* FAC PANEL */
-.fac-panel{background:rgba(27,58,107,.04);border:1px solid rgba(27,58,107,.12);border-radius:10px;padding:1.1rem;margin-bottom:1rem}
-.fac-panel h3{font-size:.7rem;text-transform:uppercase;letter-spacing:.15em;color:var(--grigio);font-family:"IBM Plex Mono",monospace;margin-bottom:.85rem}
-.nav-btns{display:flex;gap:.6rem;flex-wrap:wrap}
-.nbtn{padding:.5rem 1rem;border-radius:7px;border:2px solid var(--blu);background:transparent;color:var(--blu);font-family:"IBM Plex Sans",sans-serif;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .2s}
-.nbtn:hover{background:var(--blu);color:var(--avorio)}
-.nbtn.pri{background:var(--blu);color:var(--avorio)}
-.nbtn.pri:hover{background:var(--blu2)}
-.nbtn.danger{border-color:var(--rosso);color:var(--rosso)}
-.nbtn.danger:hover{background:var(--rosso);color:white}
-
-/* RISPOSTE FAC */
-.fac-answers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:.6rem;margin-top:.75rem}
-.fanswer{background:var(--bianco);border-radius:8px;padding:.75rem 1rem;border-left:3px solid var(--gc);font-size:.82rem;line-height:1.5;color:#374151}
-.fanswer .frole{font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--grigio);margin-bottom:.3rem}
-.fanswer.empty{color:var(--grigio);font-style:italic}
-
-/* FASE 3 VOTO ELIMINAZIONE */
-.elimina-list{list-style:none;margin-top:.75rem}
-.elimina-item{display:flex;align-items:flex-start;gap:.75rem;padding:.75rem;border:2px solid var(--gc);border-radius:9px;margin-bottom:.5rem;background:var(--bianco);cursor:pointer;transition:all .2s}
-.elimina-item:hover{border-color:var(--rosso)}
-.elimina-item.voted{border-color:var(--rosso);background:rgba(192,57,43,.05)}
-.elimina-item .check{width:20px;height:20px;border:2px solid var(--gc);border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .2s}
-.elimina-item.voted .check{background:var(--rosso);border-color:var(--rosso);color:white}
-.elimina-item .text{font-size:.875rem;line-height:1.5;color:#374151}
-.elimina-item .votes{font-family:"IBM Plex Mono",monospace;font-size:.72rem;color:var(--rosso);font-weight:600;margin-left:auto;flex-shrink:0}
-
-/* CANGURO */
-.canguro-alerts{position:fixed;bottom:1.25rem;right:1.25rem;z-index:200;display:flex;flex-direction:column;gap:.4rem;max-width:260px}
-.ca{background:var(--rosso);color:white;padding:.65rem .9rem;border-radius:9px;font-size:.82rem;font-weight:500;box-shadow:0 4px 16px rgba(192,57,43,.4);animation:si .3s ease}
-@keyframes si{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
-.kclear{position:fixed;bottom:1.25rem;left:1.25rem;z-index:201;display:none}
-.kclear button{background:var(--blu);color:white;border:none;border-radius:7px;padding:.45rem .9rem;font-family:"IBM Plex Sans",sans-serif;font-size:.78rem;font-weight:600;cursor:pointer}
-.kcount{display:inline-flex;align-items:center;background:var(--rosso);color:white;padding:.15rem .5rem;border-radius:12px;font-size:.75rem;font-weight:700;margin-left:.35rem}
-
-/* PROIETTORE */
-#screen-proj{min-height:100vh;background:var(--blu);display:none;flex-direction:column;align-items:center;justify-content:center;padding:2rem;text-align:center;position:relative}
-.proj-phase{font-family:"IBM Plex Mono",monospace;font-size:.9rem;letter-spacing:.3em;color:var(--ambra);text-transform:uppercase;margin-bottom:.4rem}
-.proj-title{font-size:clamp(1.6rem,4vw,2.8rem);font-weight:700;color:var(--avorio);margin-bottom:1.5rem;line-height:1.2;max-width:700px}
-.proj-timer{font-family:"IBM Plex Mono",monospace;font-size:clamp(3rem,10vw,7rem);font-weight:600;color:var(--avorio);margin-bottom:.5rem}
-.proj-timer.urgent{color:var(--rosso);animation:pr 1s ease-in-out infinite}
-.proj-sub{font-size:1rem;color:rgba(248,246,241,.5);margin-bottom:2rem}
-.proj-answers{width:100%;max-width:800px;display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:.75rem;margin-top:1.5rem;display:none}
-.proj-answer-card{background:rgba(248,246,241,.07);border-radius:10px;padding:.85rem 1rem;text-align:left}
-.proj-answer-group{font-family:"IBM Plex Mono",monospace;font-size:.65rem;color:var(--ambra);margin-bottom:.35rem;letter-spacing:.1em}
-.proj-answer-text{font-size:.82rem;color:rgba(248,246,241,.85);line-height:1.5}
-.proj-elimina{width:100%;max-width:600px;margin-top:1.5rem;display:none}
-.proj-el-item{background:rgba(248,246,241,.07);border-radius:9px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center}
-.proj-el-text{font-size:.9rem;color:var(--avorio);text-align:left;line-height:1.4}
-.proj-el-votes{font-family:"IBM Plex Mono",monospace;font-size:1.1rem;font-weight:700;color:var(--rosso)}
-
-/* REPORT */
-.report-btn{display:block;width:100%;padding:1rem;background:var(--verde);color:white;border:none;border-radius:10px;font-family:"IBM Plex Sans",sans-serif;font-size:1rem;font-weight:600;cursor:pointer;margin-top:1rem;transition:background .2s;text-align:center}
-.report-btn:hover{background:#1e4d38}
-
-/* FOOTER */
-footer{text-align:center;padding:1.25rem;font-size:.72rem;color:var(--grigio);border-top:1px solid var(--gc);font-family:"IBM Plex Mono",monospace;letter-spacing:.05em}
-
-@media(max-width:600px){
-  .phase-nm{display:none}
-  main{padding:.9rem}
-  .tctrls{display:none}
-  .group-grid{grid-template-columns:repeat(4,1fr)}
-}
+/* PROJECTOR */
+#screen-proj{display:none;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;background:var(--blu);padding:2rem;text-align:center;color:var(--avorio)}.proj-phase{font-family:"IBM Plex Mono",monospace;font-size:.82rem;letter-spacing:.28em;color:var(--ambra);text-transform:uppercase;margin-bottom:.45rem}.proj-title{font-size:clamp(1.7rem,4vw,3rem);font-weight:800;line-height:1.15;margin-bottom:1.4rem}.proj-timer{font-family:"IBM Plex Mono",monospace;font-size:clamp(3rem,10vw,7rem);font-weight:800;margin-bottom:.5rem}.proj-timer.urgent{color:var(--rosso);animation:pr 1s ease-in-out infinite}.proj-help{background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.16);border-radius:12px;padding:.8rem 1rem;margin-bottom:1rem;max-width:760px;line-height:1.5}.proj-results{width:100%;max-width:780px;margin-top:1rem}.proj-opt{background:rgba(255,255,255,.1);border-radius:10px;padding:.85rem 1.1rem;margin-bottom:.62rem;display:flex;align-items:center;position:relative;overflow:hidden}.proj-bar{position:absolute;left:0;top:0;bottom:0;border-radius:10px;transition:width .8s ease,background .8s ease}.proj-oc{position:relative;z-index:1;display:flex;justify-content:space-between;align-items:center;width:100%;gap:1rem}.proj-label{font-size:1rem;font-weight:600;text-align:left;color:var(--avorio)}.proj-pct{font-family:"IBM Plex Mono",monospace;font-size:1.08rem;font-weight:800;color:var(--avorio)}
+@media(max-width:680px){.phase-nm{display:none}main{padding:.85rem}.grid{grid-template-columns:1fr}.tctrls{display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
-<!-- LANDING -->
-<div id="screen-landing" class="screen active">
-  <div class="join-logo">Laboratorio · TRIZ · 2026</div>
-  <div style="margin-bottom:1.25rem;display:flex;flex-direction:column;align-items:center;gap:.5rem">
-    <div style="background:rgba(248,246,241,.08);border-radius:10px;padding:7px"><svg width="205" height="205" viewBox="0 0 205 205" xmlns="http://www.w3.org/2000/svg" style="display:block"><rect width="205" height="205" fill="#1B3A6B" rx="8"/><rect x="10" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="10" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="15" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="20" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="25" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="30" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="35" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="40" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="45" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="50" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="55" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="60" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="65" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="70" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="75" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="80" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="85" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="90" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="95" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="100" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="105" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="110" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="115" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="120" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="125" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="130" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="135" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="140" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="145" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="45" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="150" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="155" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="120" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="160" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="175" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="165" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="170" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="50" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="75" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="175" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="55" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="125" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="135" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="165" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="180" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="60" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="70" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="115" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="130" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="140" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="170" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="180" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="185" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="185" width="5" height="5" fill="#F8F6F1"/>
-<rect x="10" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="15" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="20" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="25" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="30" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="35" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="40" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="65" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="80" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="85" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="90" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="95" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="100" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="105" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="110" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="145" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="150" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="155" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="160" y="190" width="5" height="5" fill="#F8F6F1"/>
-<rect x="190" y="190" width="5" height="5" fill="#F8F6F1"/></svg></div>
-    <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;letter-spacing:.1em;color:rgba(248,246,241,.35)">Scansiona per accedere</span>
-  </div>
-  <div class="info-box">
-    <div class="label">Modalità gruppi</div>
-    <p>Riunitevi in gruppi di <strong style="color:var(--avorio)">8-10 persone</strong> e usate un solo device per gruppo. Decidete insieme.</p>
-  </div>
-  <button class="cta-btn" onclick="showGroupScreen()">Seleziona il tuo gruppo →</button>
-  <div style="margin-top:1.5rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:rgba(248,246,241,.25)">© 2026 Adriana Augenti</div>
+<div id="screen-landing" class="screen-full">
+  <div class="logo">Modulo 04 · Governance, etica, responsabilità</div>
+  <h1 class="hero-title">AI Disaster Board</h1>
+  <p class="hero-sub">Progettiamo il disastro: come far fallire la governance dell’IA ragionando a silos.</p>
+  <div class="hero-card"><strong>Regola del gioco:</strong> per qualche minuto ogni ufficio può difendere il proprio silos. Poi si torna ente pubblico e si scrive la Stop Doing List.</div>
+  <button class="primary-big" onclick="showRoleScreen()">Entra nel tavolo di governance</button>
 </div>
 
-<!-- SELEZIONE GRUPPO -->
-<div id="screen-join" class="screen">
+<div id="screen-join" class="screen-full hidden">
   <div class="join-card">
-    <h2>Seleziona il tuo gruppo</h2>
-    <div class="group-grid">
-      <button class="gbtn" onclick="selectGroup(1)">Gruppo 1</button>
-      <button class="gbtn" onclick="selectGroup(2)">Gruppo 2</button>
-      <button class="gbtn" onclick="selectGroup(3)">Gruppo 3</button>
-      <button class="gbtn" onclick="selectGroup(4)">Gruppo 4</button>
-      <button class="gbtn" onclick="selectGroup(5)">Gruppo 5</button>
-      <button class="gbtn" onclick="selectGroup(6)">Gruppo 6</button>
-      <button class="gbtn" onclick="selectGroup(7)">Gruppo 7</button>
-      <button class="gbtn" onclick="selectGroup(8)">Gruppo 8</button>
-    </div>
-    <button class="join-btn" id="join-btn" disabled onclick="joinSession()">Entra nel laboratorio →</button>
+    <div class="info-box">Scegli il ruolo del tuo gruppo. Un dispositivo per gruppo. Non servono dati reali: si lavora solo su scenario fittizio.</div>
+    <h2>Scegli il ruolo</h2>
+    <button class="role-btn" id="btn-direzione" onclick="selectRole('direzione')"><span class="rn">Direzione / Governance PNRR</span><span class="rd">Fondi, milestone, reputazione, velocità.</span></button>
+    <button class="role-btn" id="btn-rup" onclick="selectRole('rup')"><span class="rn">Ufficio acquisti / RUP / DEC</span><span class="rd">Capitolato, fornitore, collaudo, documentazione.</span></button>
+    <button class="role-btn" id="btn-segreteria" onclick="selectRole('segreteria')"><span class="rn">Segreteria studenti / Front office</span><span class="rd">Ticket, mail, studenti arrabbiati, tempi impossibili.</span></button>
+    <button class="role-btn" id="btn-it" onclick="selectRole('it')"><span class="rn">IT / RTD / Sistemi informativi</span><span class="rd">Sicurezza, log, account, strumenti autorizzati.</span></button>
+    <button class="role-btn" id="btn-dpo" onclick="selectRole('dpo')"><span class="rn">DPO / Privacy / Compliance</span><span class="rd">Dati personali, DPIA, minimizzazione, trasparenza.</span></button>
+    <button class="role-btn" id="btn-docenti" onclick="selectRole('docenti')"><span class="rn">Docenti / Commissioni / Area didattica</span><span class="rd">Valutazione, autonomia, merito, prove artistiche.</span></button>
+    <button class="join-btn" id="join-btn" disabled onclick="joinSession()">Partecipa</button>
   </div>
 </div>
 
-<!-- PROIETTORE -->
+<div id="screen-main">
+  <header>
+    <div class="hl"><span class="conn-st" id="conn-st">●</span><div><div class="phase-ind" id="phase-ind">FASE 1</div><div class="phase-nm" id="phase-nm">Scenario</div></div></div>
+    <div class="timer-wrap">
+      <div class="timer-svg-wrap"><svg width="48" height="48"><circle class="timer-track" cx="24" cy="24" r="20"></circle><circle class="timer-fill" id="timer-circle" cx="24" cy="24" r="20" stroke-dasharray="125.66" stroke-dashoffset="0"></circle></svg><div class="timer-text" id="timer-display">0:00</div></div>
+      <div class="tctrls" id="tctrls"><button class="tctrl" onclick="timerToggle()" id="timer-toggle">⏸</button><button class="tctrl" onclick="timerReset()">↺</button></div>
+    </div>
+  </header>
+  <div class="phases-bar" id="phases-bar"></div>
+  <main>
+    <div id="fac-panel" class="fac-panel hidden"></div>
+    <div id="content"></div>
+  </main>
+  <footer>AI Disaster Board · Avv.ta Adriana Augenti – Avvocata</footer>
+</div>
+
 <div id="screen-proj">
   <div class="proj-phase" id="proj-phase-label">FASE 1</div>
-  <div class="proj-title" id="proj-phase-title">La Progettazione del Disastro</div>
-  <div class="proj-timer" id="proj-timer">10:00</div>
-  <div class="proj-sub" id="proj-sub">Ogni gruppo sta costruendo il peggior sistema AI possibile</div>
-  <div class="proj-answers" id="proj-answers"></div>
-  <div class="proj-elimina" id="proj-elimina"></div>
-  <div style="position:absolute;bottom:1rem;right:1.5rem;font-family:'IBM Plex Mono',monospace;font-size:.62rem;color:rgba(248,246,241,.25)">© 2026 Adriana Augenti</div>
+  <div class="proj-title" id="proj-phase-name">Scenario</div>
+  <div class="proj-timer" id="proj-timer">0:00</div>
+  <div class="proj-help" id="proj-help">Apri il link della SPA dal dispositivo del gruppo. Il timer fa terrorismo istituzionale, ma per una buona causa.</div>
+  <div class="proj-results" id="proj-results"></div>
 </div>
-
-<!-- MAIN APP -->
-<div id="screen-main" style="display:none;min-height:100vh;flex-direction:column">
-  <header>
-    <div class="hl">
-      <div>
-        <div class="phase-ind" id="header-phase-num">FASE 1</div>
-        <div class="phase-nm" id="header-phase-name">La Progettazione del Disastro</div>
-      </div>
-      <span class="group-badge" id="group-badge">Gruppo —</span>
-    </div>
-    <div class="timer-wrap">
-      <div class="timer-svg-wrap">
-        <svg width="48" height="48" viewBox="0 0 48 48">
-          <circle class="timer-track" cx="24" cy="24" r="20"/>
-          <circle class="timer-fill" id="timer-circle" cx="24" cy="24" r="20"
-            stroke-dasharray="125.66" stroke-dashoffset="0"/>
-        </svg>
-        <div class="timer-text" id="timer-display">10:00</div>
-      </div>
-      <div class="tctrls" id="tctrls" style="display:none">
-        <button class="tctrl" id="tctrl-pause" onclick="timerToggle()">⏸</button>
-        <button class="tctrl" onclick="timerReset()">↺</button>
-      </div>
-      <span class="conn-st" id="conn-st">●</span>
-    </div>
-    <button class="kbtn" id="kbtn" onclick="sendKangaro()">🦘</button>
-  </header>
-
-  <div class="phases-bar">
-    <div class="ptab active" data-phase="0">Fase 1 · Disastro <span class="tt">10 min</span></div>
-    <div class="ptab" data-phase="1">Fase 2 · Verità <span class="tt">10 min</span></div>
-    <div class="ptab" data-phase="2">Fase 3 · Abbandono <span class="tt">10 min</span></div>
-  </div>
-
-  <main id="main-content"></main>
-  <footer>© 2026 Adriana Augenti · Tutti i diritti riservati</footer>
-</div>
-
-<div class="canguro-alerts" id="canguro-alerts"></div>
-<div class="kclear" id="kclear"><button onclick="clearKangaro()">✓ Azzera 🦘</button></div>
-
-<script>
-// Coda onclick — le funzioni vengono registrate dal modulo Firebase
-window._fns = {};
-window._queue = [];
-window.showGroupScreen = function() {
-  document.getElementById("screen-landing").classList.remove("active");
-  document.getElementById("screen-join").classList.add("active");
-};
-["selectGroup","joinSession","goToPhase","timerToggle","timerReset",
- "sendKangaro","clearKangaro","saveAnswer","submitElimina",
- "resetSessione","downloadReport"].forEach(function(fn) {
-  window[fn] = function() {
-    var args = Array.prototype.slice.call(arguments);
-    if (window._fns[fn]) return window._fns[fn].apply(null, args);
-    window._queue.push([fn, args]);
-  };
-});
-window._ready = function(fns) {
-  Object.assign(window._fns, fns);
-  window._queue.forEach(function(item) {
-    if (fns[item[0]]) fns[item[0]].apply(null, item[1]);
-  });
-  window._queue = [];
-};
-</script>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, set, get, onValue, push, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+import { getDatabase, ref, set, get, onValue, push, remove, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBvXY6G8i6Tal_o-ex596yCsqEWVSjPHfE",
@@ -1004,578 +121,278 @@ const firebaseConfig = {
   messagingSenderId: "841878394031",
   appId: "1:841878394031:web:eb2b81732fc229070ff05a"
 };
-
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
+const ROOT = 'modulo4_disaster_lab';
 
-// STATO
-let myGroup = null;
-let isFacilitatore = false;
-let isProiettore = false;
-let currentPhase = 0;
-let timerInterval = null;
-let myAnswers = {};
-let myElimina = {};
+let myRole = null, isFacilitatore=false, isProiettore=false, currentPhase=0, timerInterval=null, projTimerInterval=null;
+let myId = localStorage.getItem('ai_disaster_client_id');
+if(!myId){ myId = 'g_' + Math.random().toString(36).slice(2,10); localStorage.setItem('ai_disaster_client_id', myId); }
+let localChoices = [];
+let localVotes = {};
 
-const PHASE_DUR = [600, 600, 600];
-const PHASE_NAMES = [
-  "La Progettazione del Disastro",
-  "Il Momento della Verita",
-  "La Distruzione Creativa"
+const PHASES = [
+  {name:'Scenario', mins:2},
+  {name:'Progetta il disastro', mins:5},
+  {name:'Crisi dinamica', mins:5},
+  {name:'Litighiamo bene', mins:4},
+  {name:'Stop Doing List', mins:4},
+  {name:'Report finale', mins:2}
 ];
-const PHASE_SUBS = [
-  "Ogni gruppo sta costruendo il peggior sistema AI possibile",
-  "Cosa di questo somiglia alla nostra realta lavorativa?",
-  "Cosa dobbiamo smettere di fare subito?"
-];
-const CIRC = 2 * Math.PI * 20;
 
-// URL PARAMS
+const ROLES = {
+  direzione:{name:'Direzione / Governance PNRR', badge:'PNRR', line:'Abbiamo fondi, scadenze e indicatori: non possiamo restare fermi.'},
+  rup:{name:'Ufficio acquisti / RUP / DEC', badge:'CAPITOLATO', line:'Se volete log, audit e limiti d’uso, dovete dirmelo prima del capitolato.'},
+  segreteria:{name:'Segreteria studenti / Front office', badge:'FRONT OFFICE', line:'Se il chatbot ci toglie il 40% delle mail, io lo voglio domani.'},
+  it:{name:'IT / RTD / Sistemi informativi', badge:'LOG', line:'Se ognuno usa il tool che vuole, poi quando succede qualcosa venite tutti da noi.'},
+  dpo:{name:'DPO / Privacy / Compliance', badge:'DPIA', line:'Prima di parlare di IA, ditemi quali dati trattate e dove finiscono.'},
+  docenti:{name:'Docenti / Commissioni / Area didattica', badge:'VALUTAZIONE', line:'La valutazione non è un ticket amministrativo.'}
+};
+
+const MOVES = {
+  direzione:[
+    {t:'Annunciare il progetto IA prima di definire ruoli, policy e perimetro.', cats:['pnrr','governance']},
+    {t:'Spingere per partire subito perché ci sono milestone PNRR e indicatori da rendicontare.', cats:['pnrr']},
+    {t:'Chiedere agli uffici di “sperimentare liberamente” per accelerare.', cats:['shadow','governance']},
+    {t:'Misurare il successo solo sul numero di ticket ridotti.', cats:['chatbot','governance']},
+    {t:'Convocare DPO, IT e RUP solo quando il progetto è già deciso.', cats:['governance','pnrr']}
+  ],
+  rup:[
+    {t:'Accettare “sistema conforme all’AI Act” senza pretendere documentazione verificabile.', cats:['procurement','pnrr']},
+    {t:'Non chiedere log, audit, localizzazione dati, metriche e limiti d’uso.', cats:['procurement','privacy']},
+    {t:'Fare un capitolato sulle funzionalità, non su responsabilità, controlli e aggiornamenti.', cats:['procurement','governance']},
+    {t:'Non prevedere clausole su subfornitori, riuso dei dati e modifiche del modello.', cats:['procurement','privacy']},
+    {t:'Collaudare sul “funziona” senza testare casi limite, escalation e reportistica.', cats:['procurement','chatbot']}
+  ],
+  segreteria:[
+    {t:'Usare strumenti gratuiti con testi reali, matricole e situazioni personali.', cats:['shadow','privacy']},
+    {t:'Far rispondere il chatbot anche su termini, benefici, esclusioni, tasse e reclami.', cats:['chatbot','governance']},
+    {t:'Non salvare le risposte date agli studenti perché “non abbiamo tempo”.', cats:['chatbot','governance']},
+    {t:'Usare l’output IA come comunicazione pronta senza riesame umano.', cats:['shadow','chatbot']},
+    {t:'Non segnalare errori del sistema per evitare altri adempimenti.', cats:['governance','chatbot']}
+  ],
+  it:[
+    {t:'Attivare sistemi senza mappare i procedimenti e i punti in cui incidono.', cats:['governance','procurement']},
+    {t:'Dare account e accessi senza policy, formazione e regole d’uso.', cats:['shadow','privacy']},
+    {t:'Non prevedere log leggibili anche dagli uffici competenti.', cats:['governance','procurement']},
+    {t:'Trattare il problema come solo tecnico, ignorando effetti amministrativi.', cats:['governance']},
+    {t:'Non sapere quali strumenti IA gli uffici stanno già usando.', cats:['shadow','governance']}
+  ],
+  dpo:[
+    {t:'Essere coinvolta solo a contratto già firmato e sistema già configurato.', cats:['privacy','governance']},
+    {t:'Limitarsi a dire “serve DPIA” senza indicare condizioni operative.', cats:['privacy','governance']},
+    {t:'Non distinguere uso di supporto, uso decisionale e profilazione.', cats:['privacy','profilazione']},
+    {t:'Non presidiare dati particolari, DSA, disabilità e studenti vulnerabili.', cats:['privacy','profilazione']},
+    {t:'Non chiedere trasparenza verso studenti, candidati e personale.', cats:['privacy','chatbot']}
+  ],
+  docenti:[
+    {t:'Usare anti-AI writing come prova definitiva contro uno studente.', cats:['valutazione','privacy']},
+    {t:'Far sintetizzare all’IA giudizi qualitativi, prove artistiche o portfolio.', cats:['valutazione']},
+    {t:'Usare IA per ordinare candidati, elaborati o portfolio senza regole comuni.', cats:['valutazione','governance']},
+    {t:'Non dichiarare l’uso di strumenti IA nei lavori di commissione.', cats:['valutazione','shadow']},
+    {t:'Considerare la valutazione didattica fuori dalla governance dell’ente.', cats:['valutazione','governance']}
+  ]
+};
+
+const CRISES = {
+  pnrr:{title:'Crisi PNRR · Fornitore opaco e collaudo impossibile', text:'Il progetto finanziato è partito rapidamente. Il fornitore prometteva una piattaforma AI “chiavi in mano”, ma al collaudo non consegna log comprensibili, metriche di accuratezza, istruzioni d’uso complete né dettagli sugli aggiornamenti del modello. La Direzione deve rendicontare, il RUP chiede documentazione, gli uffici hanno già iniziato a usare il sistema.', lines:{direzione:'Non possiamo perdere il finanziamento.',rup:'Non posso collaudare una scatola nera.',segreteria:'Ma noi lo stiamo già usando.',it:'Non abbiamo controllo tecnico sufficiente.',dpo:'Non so dove finiscono i dati.',docenti:'Nessuno ci ha chiesto se impatta le valutazioni.'}},
+  procurement:{title:'Crisi acquisti · La scatola nera era nel capitolato', text:'Il contratto parla molto di funzionalità e pochissimo di log, audit, dati, aggiornamenti, subfornitori, limiti d’uso e casi di blocco. Ora l’ente deve gestire contestazioni e non ha gli strumenti contrattuali per pretendere spiegazioni tecniche.', lines:{direzione:'Avevamo bisogno di partire.',rup:'Se non viene chiesto prima, dopo non arriva.',segreteria:'A noi serviva uno strumento, non un trattato.',it:'La documentazione tecnica è insufficiente.',dpo:'Mancano garanzie sul trattamento.',docenti:'E noi come motiviamo gli esiti?'}},
+  shadow:{title:'Crisi Shadow AI · Tutti usavano qualcosa', text:'Si scopre che più uffici usano strumenti AI gratuiti o non autorizzati per riscrivere email, riassumere documenti, preparare FAQ e sintetizzare richieste degli studenti. Alcuni prompt contenevano dati reali, matricole, situazioni personali e bozze di atti interni. Nessuno sa quanti strumenti siano in uso.', lines:{direzione:'Perché nessuno ha chiesto una policy prima?',rup:'Questi strumenti non sono neanche in contratto.',segreteria:'Lo facevamo per lavorare meglio.',it:'Non lo sapevamo e non abbiamo log.',dpo:'Questo è un trattamento fuori controllo.',docenti:'Anche noi usiamo tool simili per la didattica.'}},
+  chatbot:{title:'Crisi chatbot · FAQ diventate procedimento', text:'Il chatbot, nato per orientamento e FAQ, ha iniziato a rispondere anche su scadenze, benefici, ammissioni, tasse e reclami. Alcuni studenti hanno seguito risposte errate. L’ente riceve contestazioni e richieste di riesame.', lines:{direzione:'Era un progetto strategico.',rup:'Il contratto non disciplina escalation e responsabilità.',segreteria:'Avevamo bisogno di alleggerire il front office.',it:'Non erano previsti questi casi d’uso.',dpo:'Mancano trasparenza e base informativa chiara.',docenti:'Ora ricade anche sulle procedure didattiche.'}},
+  valutazione:{title:'Crisi valutazione · Il supporto è diventato prova', text:'Una commissione ha usato un tool anti-AI writing o un sistema di sintesi automatica per supportare la valutazione di elaborati, prove artistiche o candidature. Uno studente contesta l’esito, chiede accesso agli atti e vuole sapere quale peso abbia avuto il sistema IA nella valutazione.', lines:{direzione:'Serve una risposta istituzionale.',rup:'Non abbiamo contratto né documentazione.',segreteria:'La contestazione arriva comunque a noi.',it:'Il tool non è autorizzato.',dpo:'Che dati sono stati trattati?',docenti:'Era solo un supporto.'}},
+  profilazione:{title:'Crisi profilazione · Lo studente diventa un’etichetta', text:'L’ente usa un sistema predittivo per individuare studenti “a rischio abbandono” e indirizzarli verso servizi di supporto. Alcuni studenti scoprono di essere stati classificati e contestano il trattamento, temendo stigma e conseguenze sulla carriera.', lines:{direzione:'La finalità era inclusiva.',rup:'Il fornitore non ha dato metriche e bias test.',segreteria:'Non sappiamo come spiegare la classificazione.',it:'Il modello usa dati storici e pattern complessi.',dpo:'La finalità positiva non elimina il rischio.',docenti:'Non vogliamo etichette sugli studenti.'}},
+  governance:{title:'Crisi governance · Il tavolo è arrivato dopo il disastro', text:'Ogni ufficio ha fatto una scelta ragionevole per il proprio pezzo. Sommate insieme, quelle scelte hanno prodotto un sistema senza ruoli chiari, senza escalation, senza log adeguati, senza policy e senza una linea di responsabilità difendibile.', lines:{direzione:'Qualcuno doveva portarmi soluzioni, non solo problemi.',rup:'Io compro ciò che l’ente mi chiede di comprare.',segreteria:'Io gestisco l’emergenza quotidiana.',it:'Non posso governare strumenti che non conosco.',dpo:'Mi avete chiamata quando era già tutto deciso.',docenti:'La didattica non può essere trattata come back office.'}}
+};
+
+const POLLS = {
+  blame:{multi:false, q:'Di chi è la colpa? Scegli la risposta più seducente ma pericolosa.', opts:['Del fornitore: aveva promesso conformità e automazione sicura','Dell’ufficio che lo usava: doveva arrangiarsi meglio','Dell’IT: doveva bloccare tutto prima','Del DPO: doveva avvisare dei rischi','Della Direzione: ha spinto troppo sull’innovazione','Di tutti: ogni silos ha scaricato un pezzo di rischio sugli altri'], correct:[0.25,0,0.25,0.25,0.5,1]},
+  silo:{multi:false, q:'Quale silos ha creato davvero il disastro?', opts:['Direzione senza governance','Acquisti senza requisiti','Tecnologia senza procedimento','Privacy/compliance coinvolta troppo tardi','Didattica/commissioni fuori perimetro','Tutti i precedenti'], correct:[0.5,0.5,0.5,0.5,0.5,1]},
+  stop:{multi:true, max:3, q:'Basta silos. Quali tre cose smettiamo di fare da domani?', opts:['Usare strumenti AI non autorizzati con dati reali','Acquistare AI senza requisiti su log, audit, dati, limiti e aggiornamenti','Far rispondere chatbot su diritti, termini, benefici o esclusioni senza escalation','Usare output AI come motivazione, prova o valutazione definitiva','Coinvolgere DPO, IT, RUP e responsabili procedimento solo alla fine','Confondere supporto, automazione e decisione','Misurare l’innovazione solo su velocità e riduzione dei ticket','Lasciare ogni ufficio libero di sperimentare da solo'], correct:[1,1,1,1,1,1,1,1]}
+};
+
+function esc(s){return String(s??'').replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
+function root(path=''){ return ref(db, ROOT + (path?'/'+path:'')); }
+function now(){return Date.now();}
+function getScoreColor(score,pct=60){ if(score>=1) return `rgba(45,106,79,${pct/100*.5+.15})`; if(score>=.5) return `rgba(201,125,46,${pct/100*.4+.12})`; return `rgba(192,57,43,${pct/100*.4+.1})`; }
+function roleName(r){return ROLES[r]?.name || r || 'Gruppo';}
+
 const params = new URLSearchParams(window.location.search);
-if (params.get("facilitatore") === "AA2026") {
-  isFacilitatore = true;
-  myGroup = "facilitatore";
-  startApp();
-} else if (params.get("proiettore") === "true") {
-  isProiettore = true;
-  startProjector();
+if(params.get('facilitatore')==='AA2026'){ isFacilitatore=true; myRole='facilitatore'; startApp(); }
+else if(params.get('proiettore')==='true'){ isProiettore=true; startProjector(); }
+
+window.showRoleScreen = function(){ document.getElementById('screen-landing').classList.add('hidden'); document.getElementById('screen-join').classList.remove('hidden'); };
+window.selectRole = function(role){ myRole=role; document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected')); document.getElementById('btn-'+role)?.classList.add('selected'); document.getElementById('join-btn').disabled=false; };
+window.joinSession = async function(){ if(!myRole) return; await set(root(`presenze/${myId}`),{role:myRole, at:serverTimestamp()}); startApp(); };
+
+function startApp(){
+  document.getElementById('screen-landing').classList.add('hidden');
+  document.getElementById('screen-join').classList.add('hidden');
+  document.getElementById('screen-main').style.display='flex';
+  if(!isFacilitatore){ document.getElementById('tctrls').style.display='none'; }
+  listenSession();
+  if(isFacilitatore) listenFac();
+}
+function startProjector(){
+  document.getElementById('screen-landing').classList.add('hidden');
+  document.getElementById('screen-join').classList.add('hidden');
+  document.getElementById('screen-proj').style.display='flex';
+  listenProjector();
 }
 
-// SELEZIONE GRUPPO
-window.selectGroup = function(n) {
-  myGroup = "gruppo" + n;
-  document.querySelectorAll(".gbtn").forEach(function(b) { b.classList.remove("selected"); });
-  document.querySelectorAll(".gbtn")[n-1].classList.add("selected");
-  document.getElementById("join-btn").disabled = false;
-};
+function defaultSession(){ return {phase:0,timerTotal:PHASES[0].mins*60,timerEnd:now()+PHASES[0].mins*60000,timerPaused:false,crisis:null,createdAt:serverTimestamp()}; }
+async function ensureSession(){ const s=await get(root('session')); if(!s.exists()) await set(root('session'), defaultSession()); }
 
-window.joinSession = async function() {
-  if (!myGroup) return;
-  const rr = ref(db, "presenze/" + myGroup);
-  const snap = await get(rr);
-  await set(rr, (snap.val() || 0) + 1);
-  startApp();
-};
-
-function startApp() {
-  document.getElementById("screen-landing").classList.remove("active");
-  document.getElementById("screen-join").classList.remove("active");
-  document.getElementById("screen-main").style.display = "flex";
-  document.getElementById("screen-main").style.flexDirection = "column";
-  const label = myGroup === "facilitatore" ? "Facilitatore" :
-    "Gruppo " + myGroup.replace("gruppo","");
-  document.getElementById("group-badge").textContent = label;
-  if (isFacilitatore) {
-    document.getElementById("tctrls").style.display = "flex";
-    document.getElementById("kbtn").style.display = "none";
-  }
-  listenToSession();
-  listenToKangaro();
-  if (isFacilitatore) listenToAllAnswers();
+function listenSession(){
+  onValue(root('session'), snap=>{
+    const data=snap.val();
+    document.getElementById('conn-st').className='conn-st'; document.getElementById('conn-st').textContent='●';
+    if(!data){ if(isFacilitatore) ensureSession(); return; }
+    currentPhase=data.phase||0; renderShell(); renderFacPanel(data); renderPhase(currentPhase,data); syncTimer(data);
+  },()=>{document.getElementById('conn-st').className='conn-st off';});
+  ensureSession();
 }
 
-// PROIETTORE
-function startProjector() {
-  document.getElementById("screen-proj").style.display = "flex";
-  listenToSessionProjector();
+function renderShell(){
+  document.getElementById('phase-ind').textContent='FASE '+(currentPhase+1);
+  document.getElementById('phase-nm').textContent=PHASES[currentPhase]?.name || '';
+  document.getElementById('phases-bar').innerHTML=PHASES.map((p,i)=>`<div class="ptab ${i===currentPhase?'active':''} ${i<currentPhase?'done':''}"><span class="tt">${String(i+1).padStart(2,'0')}</span>${esc(p.name)}</div>`).join('');
 }
 
-let projInterval = null;
-function listenToSessionProjector() {
-  onValue(ref(db, "session"), function(snap) {
-    const data = snap.val();
-    if (!data) return;
-    const phase = data.phase || 0;
-    document.getElementById("proj-phase-label").textContent = "FASE " + (phase+1);
-    document.getElementById("proj-phase-title").textContent = PHASE_NAMES[phase];
-    document.getElementById("proj-sub").textContent = PHASE_SUBS[phase];
-    if (data.timerEnd && data.timerTotal) {
-      syncProjTimer(data.timerEnd, data.timerTotal, data.timerPaused, data.timerPausedAt, phase);
-    }
-    // Fase 2: mostra risposte fase 1
-    if (phase >= 1) showProjAnswers("f1");
-    // Fase 3: mostra classifica eliminazioni
-    if (phase >= 2) showProjElimina();
+function renderFacPanel(session){
+  const el=document.getElementById('fac-panel');
+  if(!isFacilitatore){el.classList.add('hidden');return;}
+  el.classList.remove('hidden');
+  el.innerHTML=`<h3>Pannello facilitatrice</h3><div class="nav-btns">
+    <button class="nbtn" onclick="goPhase(${Math.max(0,currentPhase-1)})">← Indietro</button>
+    <button class="nbtn pri" onclick="goPhase(${Math.min(PHASES.length-1,currentPhase+1)})">Avanti →</button>
+    <button class="nbtn" onclick="timerToggle()" id="timer-toggle">Pausa/Riprendi</button>
+    <button class="nbtn" onclick="timerReset()">Reset timer</button>
+    <button class="nbtn" onclick="computeCrisis(true)">Genera/aggiorna crisi</button>
+    <button class="nbtn danger" onclick="resetLab()">Reset laboratorio</button>
+  </div>
+  <div class="stats-grid" id="fac-stats"><div class="stat"><div class="n">–</div><div class="l">gruppi</div></div></div>`;
+}
+
+function listenFac(){
+  onValue(root('presenze'), snap=>{
+    const val=snap.val()||{}; const counts={}; Object.values(val).forEach(v=>{counts[v.role]=(counts[v.role]||0)+1});
+    const tot=Object.keys(val).length;
+    const stats=document.getElementById('fac-stats'); if(stats) stats.innerHTML=`<div class="stat"><div class="n">${tot}</div><div class="l">gruppi</div></div>`+Object.entries(ROLES).map(([k,r])=>`<div class="stat"><div class="n">${counts[k]||0}</div><div class="l">${esc(r.badge)}</div></div>`).join('');
   });
 }
 
-function syncProjTimer(timerEnd, timerTotal, paused, pausedAt, phase) {
-  clearInterval(projInterval);
-  const el = document.getElementById("proj-timer");
-  function update() {
-    let rem;
-    if (paused && pausedAt) rem = Math.max(0, Math.round((timerEnd - pausedAt)/1000));
-    else rem = Math.max(0, Math.round((timerEnd - Date.now())/1000));
-    const m = Math.floor(rem/60), s = rem%60;
-    el.textContent = m + ":" + (s < 10 ? "0" : "") + s;
-    el.className = "proj-timer" + (rem <= 60 && rem > 0 ? " urgent" : "");
-  }
-  update();
-  if (!paused) projInterval = setInterval(update, 500);
-}
-
-function showProjAnswers(qid) {
-  const container = document.getElementById("proj-answers");
-  container.style.display = "grid";
-  onValue(ref(db, "answers/" + qid), function(snap) {
-    const data = snap.val() || {};
-    container.innerHTML = "";
-    for (let i = 1; i <= 8; i++) {
-      const gkey = "gruppo" + i;
-      const ans = data[gkey];
-      if (ans && ans.text) {
-        container.innerHTML += '<div class="proj-answer-card">' +
-          '<div class="proj-answer-group">GRUPPO ' + i + '</div>' +
-          '<div class="proj-answer-text">' + ans.text.substring(0,200) + (ans.text.length > 200 ? "..." : "") + '</div>' +
-          '</div>';
-      }
-    }
-  });
-}
-
-function showProjElimina() {
-  const container = document.getElementById("proj-elimina");
-  container.style.display = "block";
-  onValue(ref(db, "elimina_votes"), function(snap) {
-    const data = snap.val() || {};
-    const items = [];
-    Object.entries(data).forEach(function(entry) {
-      const key = entry[0], val = entry[1];
-      if (val && val.text) {
-        let total = 0;
-        if (val.votes) Object.values(val.votes).forEach(function(v) { total += v; });
-        items.push({ text: val.text, votes: total, group: val.group });
-      }
-    });
-    items.sort(function(a,b) { return b.votes - a.votes; });
-    container.innerHTML = '<div style="font-family:IBM Plex Mono,monospace;font-size:.8rem;letter-spacing:.15em;color:var(--ambra);margin-bottom:.75rem">DA ELIMINARE SUBITO</div>';
-    items.slice(0,8).forEach(function(item) {
-      container.innerHTML += '<div class="proj-el-item">' +
-        '<span class="proj-el-text">' + item.text + '</span>' +
-        '<span class="proj-el-votes">' + item.votes + ' voti</span>' +
-        '</div>';
-    });
-  });
-}
-
-// SESSION
-function listenToSession() {
-  onValue(ref(db, "session"), function(snap) {
-    const data = snap.val();
-    const el = document.getElementById("conn-st");
-    el.className = "conn-st";
-    el.textContent = "●";
-    if (!data) { if (isFacilitatore) initSession(); return; }
-    if (data.phase !== undefined && data.phase !== currentPhase) {
-      currentPhase = data.phase;
-      renderPhase(currentPhase);
-      window.scrollTo({top:0, behavior:"smooth"});
-    }
-    if (data.timerEnd && data.timerTotal) {
-      syncTimer(data.timerEnd, data.timerTotal, data.timerPaused||false, data.timerPausedAt||null);
-    }
-  }, function() {
-    document.getElementById("conn-st").className = "conn-st off";
-  });
-}
-
-async function initSession() {
-  const dur = PHASE_DUR[0];
-  const timerEnd = Date.now() + dur*1000;
-  await set(ref(db, "session"), {
-    phase:0, timerEnd:timerEnd, timerTotal:dur,
-    timerPaused:false, timerPausedAt:null,
-    startedAt: serverTimestamp()
-  });
-  renderPhase(0);
-  syncTimer(timerEnd, dur, false, null);
-}
-
-window.goToPhase = async function(phase) {
-  if (!isFacilitatore) return;
-  currentPhase = phase;
-  const dur = PHASE_DUR[phase];
-  const timerEnd = Date.now() + dur*1000;
-  await set(ref(db, "session"), {
-    phase:phase, timerEnd:timerEnd, timerTotal:dur,
-    timerPaused:false, timerPausedAt:null
-  });
-  renderPhase(phase);
-  window.scrollTo({top:0, behavior:"smooth"});
-  syncTimer(timerEnd, dur, false, null);
-};
-
-// TIMER
-function syncTimer(timerEnd, timerTotal, paused, pausedAt) {
+const CIRC=2*Math.PI*20;
+function syncTimer(data){
   clearInterval(timerInterval);
-  function update() {
-    let rem;
-    if (paused && pausedAt) rem = Math.max(0, Math.round((timerEnd-pausedAt)/1000));
-    else rem = Math.max(0, Math.round((timerEnd-Date.now())/1000));
-    const m = Math.floor(rem/60), s = rem%60;
-    document.getElementById("timer-display").textContent = m + ":" + (s<10?"0":"") + s;
-    const offset = CIRC * (1 - rem/timerTotal);
-    const el = document.getElementById("timer-circle");
-    el.style.strokeDashoffset = offset;
-    el.className = "timer-fill" + (rem<=60&&rem>0?" urgent":"");
+  const total=data.timerTotal||120, end=data.timerEnd||now(), paused=data.timerPaused, pausedAt=data.timerPausedAt;
+  function upd(){
+    let rem=paused&&pausedAt?Math.max(0,Math.round((end-pausedAt)/1000)):Math.max(0,Math.round((end-now())/1000));
+    const m=Math.floor(rem/60), s=rem%60;
+    document.getElementById('timer-display').textContent=`${m}:${String(s).padStart(2,'0')}`;
+    const circle=document.getElementById('timer-circle'); circle.style.strokeDashoffset=CIRC*(1-rem/total); circle.classList.toggle('urgent',rem<=45&&rem>0);
   }
-  update();
-  if (!paused) timerInterval = setInterval(update, 500);
+  upd(); if(!paused) timerInterval=setInterval(upd,500);
+}
+window.goPhase=async function(p){ await set(root('session'),{phase:p,timerTotal:PHASES[p].mins*60,timerEnd:now()+PHASES[p].mins*60000,timerPaused:false,crisis:(await get(root('session/crisis'))).val()||null}); };
+window.timerReset=async function(){ const p=currentPhase; const s=(await get(root('session'))).val()||{}; await set(root('session'),{...s, phase:p,timerTotal:PHASES[p].mins*60,timerEnd:now()+PHASES[p].mins*60000,timerPaused:false,timerPausedAt:null}); };
+window.timerToggle=async function(){ const s=(await get(root('session'))).val(); if(!s) return; if(s.timerPaused){ const remaining=s.timerEnd-s.timerPausedAt; await set(root('session'),{...s,timerEnd:now()+remaining,timerPaused:false,timerPausedAt:null}); } else { await set(root('session'),{...s,timerPaused:true,timerPausedAt:now()}); }};
+window.resetLab=async function(){ if(!confirm('Azzerare tutto il laboratorio Modulo 4?')) return; await remove(root()); await set(root('session'), defaultSession()); };
+
+function renderPhase(phase,session){
+  if(phase===0) return renderScenario();
+  if(phase===1) return renderDisasterMoves();
+  if(phase===2) return renderCrisis(session);
+  if(phase===3) return renderFight(session);
+  if(phase===4) return renderStopList();
+  return renderReport(session);
 }
 
-window.timerToggle = async function() {
-  if (!isFacilitatore) return;
-  const snap = await get(ref(db, "session"));
-  const data = snap.val() || {};
-  const isPaused = data.timerPaused || false;
-  if (isPaused) {
-    const rem = Math.max(0, Math.round((data.timerEnd-(data.timerPausedAt||Date.now()))/1000));
-    const newEnd = Date.now() + rem*1000;
-    await set(ref(db, "session/timerPaused"), false);
-    await set(ref(db, "session/timerPausedAt"), null);
-    await set(ref(db, "session/timerEnd"), newEnd);
-  } else {
-    await set(ref(db, "session/timerPaused"), true);
-    await set(ref(db, "session/timerPausedAt"), Date.now());
+function renderScenario(){
+  document.getElementById('content').innerHTML=`<div class="card ambra"><div class="eyebrow">Scenario</div><div class="ctitle">Il tavolo di governance è convocato. Purtroppo.</div><div class="cbody">L’ente deve introdurre strumenti di IA per sportello studenti, ticket, comunicazione, bozze di atti, analisi dati e supporto alle commissioni. La Direzione ha pressione PNRR: fondi, obiettivi, scadenze, rendicontazione e reputazione.</div><div class="quote"><strong>Regola:</strong> per ora potete ragionare a silos. Dovete difendere il vostro ruolo anche in modo un po’ corporativo. Poi torniamo adulti.</div></div>
+  <div class="grid">${Object.entries(ROLES).map(([k,r])=>`<div class="role-mini"><span class="tag t-b">${esc(r.badge)}</span><h3>${esc(r.name)}</h3><p>“${esc(r.line)}”</p></div>`).join('')}</div>`;
+}
+
+function renderDisasterMoves(){
+  if(!myRole || isFacilitatore){
+    document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">Progetta il disastro</div><div class="ctitle">Ogni ruolo sceglie 2 mosse distruttive.</div><div class="cbody">La facilitatrice vede il risultato aggregato. I gruppi selezionano le mosse dal proprio dispositivo.</div><div id="fac-choice-summary" class="mt"></div></div>`;
+    renderChoiceSummary(); return;
   }
-  document.getElementById("tctrl-pause").textContent = isPaused ? "⏸" : "▶";
-};
+  const role=ROLES[myRole], moves=MOVES[myRole]||[];
+  document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">${esc(role.name)}</div><div class="ctitle">Scegli 2 mosse per far fallire la governance.</div><div class="cbody">Non scegliere le più corrette: scegli quelle che il tuo ufficio potrebbe fare quando è sotto pressione.</div></div>
+    <div class="card"><div id="move-list">${moves.map((m,i)=>`<div class="choice" id="move-${i}" onclick="toggleMove(${i})">${esc(m.t)}<span class="meta">${m.cats.map(c=>'#'+c).join(' ')}</span></div>`).join('')}</div><button class="save-btn" id="save-moves" onclick="saveMoves()" disabled>Salva mosse-disastro</button><span class="saved-badge" id="saved-moves">salvato ✓</span></div>`;
+}
+window.toggleMove=function(i){ const pos=localChoices.indexOf(i); if(pos>=0) localChoices.splice(pos,1); else if(localChoices.length<2) localChoices.push(i); document.querySelectorAll('.choice').forEach((el,idx)=>{el.classList.toggle('selected',localChoices.includes(idx)); el.classList.toggle('disabled',localChoices.length>=2&&!localChoices.includes(idx));}); document.getElementById('save-moves').disabled=localChoices.length!==2; };
+window.saveMoves=async function(){ const moves=MOVES[myRole]||[]; const cats=[]; localChoices.forEach(i=>cats.push(...moves[i].cats)); await set(root(`choices/${myId}`),{role:myRole, choices:localChoices.map(i=>moves[i].t), cats, at:serverTimestamp()}); document.getElementById('saved-moves')?.classList.add('show'); };
 
-window.timerReset = async function() {
-  if (!isFacilitatore) return;
-  const dur = PHASE_DUR[currentPhase];
-  const timerEnd = Date.now() + dur*1000;
-  await set(ref(db, "session/timerEnd"), timerEnd);
-  await set(ref(db, "session/timerTotal"), dur);
-  await set(ref(db, "session/timerPaused"), false);
-  await set(ref(db, "session/timerPausedAt"), null);
-};
-
-// RISPOSTE
-window.saveAnswer = async function(qid) {
-  const ta = document.getElementById("ta-"+qid);
-  if (!ta || !myGroup) return;
-  const text = ta.value.trim();
-  if (!text) return;
-  await set(ref(db, "answers/"+qid+"/"+myGroup), { text:text, group:myGroup, ts:Date.now() });
-  myAnswers[qid] = text;
-  ta.readOnly = true;
-  const btn = document.querySelector("[data-save='"+qid+"']");
-  if (btn) btn.disabled = true;
-  const ok = document.getElementById("saved-"+qid);
-  if (ok) { ok.style.opacity="1"; setTimeout(function(){ok.style.opacity="0";},2000); }
-};
-
-function listenToAllAnswers() {
-  ["f1","f2"].forEach(function(qid) {
-    onValue(ref(db, "answers/"+qid), function(snap) {
-      const data = snap.val() || {};
-      const container = document.getElementById("fac-ans-"+qid);
-      if (!container) return;
-      container.innerHTML = "";
-      let found = false;
-      for (let i=1;i<=8;i++) {
-        const g = "gruppo"+i;
-        if (data[g] && data[g].text) {
-          found = true;
-          container.innerHTML += '<div class="fanswer">' +
-            '<div class="frole">Gruppo '+i+'</div>' + data[g].text + '</div>';
-        }
-      }
-      if (!found) container.innerHTML = '<div class="fanswer empty">Nessuna risposta ancora</div>';
-    });
+function renderChoiceSummary(){
+  onValue(root('choices'), snap=>{
+    const val=snap.val()||{}; const counts={}; const byRole={};
+    Object.values(val).forEach(v=>{ byRole[v.role]=(byRole[v.role]||0)+1; (v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1); });
+    const el=document.getElementById('fac-choice-summary'); if(!el) return;
+    el.innerHTML=`<div class="stats-grid"><div class="stat"><div class="n">${Object.keys(val).length}</div><div class="l">gruppi hanno scelto</div></div>${Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([k,n])=>`<div class="stat"><div class="n">${n}</div><div class="l">#${esc(k)}</div></div>`).join('')}</div>`;
   });
 }
 
-// FASE 3: VOTO ELIMINAZIONE
-window.submitElimina = async function() {
-  if (!myGroup) return;
-  const ta = document.getElementById("ta-f3");
-  if (!ta) return;
-  const text = ta.value.trim();
-  if (!text) return;
-  const key = myGroup;
-  await set(ref(db, "elimina_votes/"+key), {
-    text:text, group:myGroup, votes:{}, ts:Date.now()
-  });
-  ta.readOnly = true;
-  const btn = document.getElementById("btn-f3");
-  if (btn) btn.disabled = true;
-  const ok = document.getElementById("saved-f3");
-  if (ok) { ok.style.opacity="1"; setTimeout(function(){ok.style.opacity="0";},2000); }
-  listenToElimina();
-};
+async function determineCrisis(){
+  const snap=await get(root('choices')); const val=snap.val()||{}; const counts={};
+  Object.values(val).forEach(v=>(v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1));
+  const mapping=[['pnrr','pnrr'],['procurement','procurement'],['shadow','shadow'],['chatbot','chatbot'],['valutazione','valutazione'],['profilazione','profilazione'],['governance','governance'],['privacy','profilazione']];
+  let best='governance', bestN=-1;
+  mapping.forEach(([cat,cr])=>{ const n=counts[cat]||0; if(n>bestN){best=cr; bestN=n;} });
+  return best;
+}
+window.computeCrisis=async function(force=false){ const cr=await determineCrisis(); const s=(await get(root('session'))).val()||defaultSession(); if(force || !s.crisis){ await set(root('session'),{...s, crisis:cr}); } return cr; };
 
-window.voteElimina = async function(key) {
-  if (myElimina[key]) return;
-  myElimina[key] = true;
-  const vr = ref(db, "elimina_votes/"+key+"/votes/"+myGroup);
-  const snap = await get(vr);
-  await set(vr, (snap.val()||0)+1);
-  listenToElimina();
-};
-
-function listenToElimina() {
-  onValue(ref(db, "elimina_votes"), function(snap) {
-    const data = snap.val() || {};
-    const container = document.getElementById("elimina-container");
-    if (!container) return;
-    const items = [];
-    Object.entries(data).forEach(function(entry) {
-      const key = entry[0], val = entry[1];
-      if (val && val.text) {
-        let total = 0;
-        if (val.votes) Object.values(val.votes).forEach(function(v){total+=v;});
-        items.push({key:key, text:val.text, votes:total});
-      }
-    });
-    items.sort(function(a,b){return b.votes-a.votes;});
-    container.innerHTML = "";
-    items.forEach(function(item) {
-      const voted = !!myElimina[item.key];
-      container.innerHTML += '<li class="elimina-item'+(voted?" voted":"")+
-        '" onclick="window.voteElimina(\''+item.key+'\')">' +
-        '<span class="check">'+(voted?"✓":"")+"</span>" +
-        '<span class="text">'+item.text+"</span>" +
-        '<span class="votes">'+item.votes+" voti</span>" +
-        "</li>";
-    });
-    if (items.length === 0) {
-      container.innerHTML = '<li style="padding:.75rem;color:var(--grigio);font-size:.85rem;font-style:italic">I comportamenti da eliminare appariranno qui man mano che i gruppi li inseriscono</li>';
-    }
-  });
+async function renderCrisis(session){
+  let cid=session?.crisis; if(!cid && isFacilitatore) cid=await window.computeCrisis(false); if(!cid) cid='governance'; const c=CRISES[cid];
+  document.getElementById('content').innerHTML=`<div class="card rosso"><div class="eyebrow">Crisi dinamica</div><div class="crisis-title">${esc(c.title)}</div><div class="crisis-box">${esc(c.text)}</div></div>
+  <div class="card ambra"><div class="eyebrow">Benzina sul fuoco</div><div class="ctitle">Ora difendete il vostro silos.</div><div class="cbody">Per qualche minuto potete essere ingenerosi, corporativi e difensivi. Poi ricomponiamo.</div><div class="mt">${Object.entries(c.lines).map(([r,l])=>`<div class="fight-line"><strong>${esc(roleName(r))}:</strong> “${esc(l)}”</div>`).join('')}</div></div>
+  ${mkPoll('blame')}`;
+  listenPoll('blame');
 }
 
-// KANGARO
-function listenToKangaro() {
-  onValue(ref(db, "kangaro"), function(snap) {
-    if (!isFacilitatore) return;
-    const data = snap.val();
-    const alertsEl = document.getElementById("canguro-alerts");
-    alertsEl.innerHTML = "";
-    if (!data) { document.getElementById("kclear").style.display="none"; return; }
-    const items = Object.values(data)
-      .filter(function(k){return k&&k.ts&&(Date.now()-k.ts<180000);})
-      .sort(function(a,b){return b.ts-a.ts;})
-      .slice(0,5);
-    items.forEach(function(k) {
-      const el = document.createElement("div");
-      el.className = "ca";
-      el.textContent = "🦘 " + k.group + " ha bisogno di aiuto!";
-      alertsEl.appendChild(el);
-    });
-    if (items.length > 0) {
-      document.getElementById("kclear").style.display = "block";
-    } else {
-      document.getElementById("kclear").style.display = "none";
-    }
-  });
+function renderFight(session){
+  const cid=session?.crisis||'governance'; const c=CRISES[cid];
+  document.getElementById('content').innerHTML=`<div class="card ambra"><div class="eyebrow">Litighiamo bene</div><div class="ctitle">La domanda non è solo “di chi è la colpa”.</div><div class="cbody">La domanda vera è: quale pezzo dell’organizzazione ha ragionato come se fosse solo?</div><div class="quote"><strong>Frase guida:</strong> Il rischio AI non è tecnico, privacy, contrattuale o didattico. È tutte queste cose insieme.</div></div>${mkPoll('silo')}`;
+  listenPoll('silo');
 }
 
-window.sendKangaro = async function() {
-  if (isFacilitatore) return;
-  const btn = document.getElementById("kbtn");
-  btn.classList.add("sent");
-  setTimeout(function(){btn.classList.remove("sent");}, 2000);
-  const label = "Gruppo " + myGroup.replace("gruppo","");
-  await push(ref(db, "kangaro"), {group:label, ts:Date.now()});
-};
-
-window.clearKangaro = async function() {
-  await set(ref(db, "kangaro"), null);
-  document.getElementById("canguro-alerts").innerHTML = "";
-  document.getElementById("kclear").style.display = "none";
-};
-
-// RESET
-window.resetSessione = async function() {
-  if (!confirm("Azzerare tutta la sessione?")) return;
-  await set(ref(db, "session"), null);
-  await set(ref(db, "kangaro"), null);
-  await set(ref(db, "presenze"), null);
-  await set(ref(db, "answers"), null);
-  await set(ref(db, "elimina_votes"), null);
-  location.reload();
-};
-
-// REPORT
-window.downloadReport = async function() {
-  const snap = await get(ref(db, "/"));
-  const all = snap.val() || {};
-  let txt = "═══════════════════════════════════════\n";
-  txt += "REPORT LABORATORIO TRIZ\n";
-  txt += "Distruzione Creativa e AI nella PA\n";
-  txt += "Generato il " + new Date().toLocaleString("it-IT") + "\n";
-  txt += "© 2026 Adriana Augenti\n";
-  txt += "═══════════════════════════════════════\n\n";
-
-  txt += "── PRESENZE PER GRUPPO ──\n";
-  const p = all.presenze || {};
-  for (let i=1;i<=8;i++) {
-    txt += "Gruppo "+i+": "+(p["gruppo"+i]||0)+" accessi\n";
-  }
-  txt += "\n";
-
-  txt += "── FASE 1: IL DISASTRO PROGETTATO ──\n\n";
-  const f1 = (all.answers||{}).f1 || {};
-  for (let i=1;i<=8;i++) {
-    const ans = f1["gruppo"+i];
-    if (ans && ans.text) txt += "Gruppo "+i+":\n"+ans.text+"\n\n";
-  }
-
-  txt += "── FASE 2: COSA FACCIAMO GIA OGGI ──\n\n";
-  const f2 = (all.answers||{}).f2 || {};
-  for (let i=1;i<=8;i++) {
-    const ans = f2["gruppo"+i];
-    if (ans && ans.text) txt += "Gruppo "+i+":\n"+ans.text+"\n\n";
-  }
-
-  txt += "── FASE 3: DA ELIMINARE SUBITO (per voti) ──\n\n";
-  const ev = all.elimina_votes || {};
-  const items = [];
-  Object.values(ev).forEach(function(val) {
-    if (val && val.text) {
-      let total = 0;
-      if (val.votes) Object.values(val.votes).forEach(function(v){total+=v;});
-      items.push({text:val.text, votes:total, group:val.group});
-    }
-  });
-  items.sort(function(a,b){return b.votes-a.votes;});
-  items.forEach(function(item,i) {
-    txt += (i+1)+". ["+item.votes+" voti] "+item.text+"\n";
-  });
-
-  const blob = new Blob([txt], {type:"text/plain;charset=utf-8"});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url; a.download = "report-triz.txt"; a.click();
-  URL.revokeObjectURL(url);
-};
-
-// RENDER
-function renderPhase(phase) {
-  window.scrollTo({top:0, behavior:"smooth"});
-  document.getElementById("header-phase-num").textContent = "FASE "+(phase+1);
-  document.getElementById("header-phase-name").textContent = PHASE_NAMES[phase];
-  document.querySelectorAll(".ptab").forEach(function(t,i) {
-    t.className = "ptab"+(i===phase?" active":i<phase?" done":"");
-  });
-  const main = document.getElementById("main-content");
-  if (phase===0) main.innerHTML = renderF1();
-  else if (phase===1) main.innerHTML = renderF2();
-  else main.innerHTML = renderF3();
-  if (isFacilitatore) listenToAllAnswers();
-  if (phase===2) listenToElimina();
+function renderStopList(){
+  document.getElementById('content').innerHTML=`<div class="card verde"><div class="eyebrow">Stop Doing List</div><div class="ctitle">Ora smettiamo di difenderci.</div><div class="cbody">Scegliete massimo tre comportamenti che l’ente deve interrompere da domani. Non sono buoni propositi: sono divieti organizzativi minimi.</div></div>${mkPoll('stop')}`;
+  listenPoll('stop');
 }
 
-function facPanel(prev, next, prevLabel, nextLabel) {
-  const qid = prev === null ? "f1" : (prev === 0 ? "f2" : "f3");
-  return '<div class="fac-panel">' +
-    '<h3>🎛 Pannello Facilitatore · Adriana Augenti</h3>' +
-    '<div class="nav-btns">' +
-    (prev!==null?'<button class="nbtn" onclick="goToPhase('+prev+')">← '+prevLabel+'</button>':'') +
-    (next!==null?'<button class="nbtn pri" onclick="goToPhase('+next+')">→ '+nextLabel+'</button>':'') +
-    '<button class="nbtn" onclick="timerReset()">↺ Riavvia timer</button>' +
-    (next===null?'<button class="nbtn danger" onclick="resetSessione()">⚠ Reset sessione</button>':'') +
-    '</div>' +
-    (next===null?'<button class="report-btn" style="width:100%;margin-top:.75rem" onclick="downloadReport()">⬇ Scarica report (TXT)</button>':'') +
-    '</div>';
+function mkPoll(pid){ const p=POLLS[pid]; if(!p) return ''; return `<div class="card"><div class="eyebrow">Votazione</div><div class="ctitle">${esc(p.q)}</div><div id="poll-${pid}">${p.opts.map((o,i)=>`<div class="poll-opt" id="${pid}-${i}" onclick="vote('${pid}',${i})"><div class="pbar"></div><div class="poc"><span class="plabel">${esc(o)}</span><span><span class="ppct"></span><span class="pcnt"></span></span></div></div>`).join('')}</div><button class="save-btn" onclick="submitVote('${pid}')">Invia voto</button><span class="saved-badge" id="saved-${pid}">salvato ✓</span></div>`; }
+window.vote=function(pid,i){ const p=POLLS[pid]; localVotes[pid]=localVotes[pid]||[]; if(!p.multi) localVotes[pid]=[i]; else { const arr=localVotes[pid]; const pos=arr.indexOf(i); if(pos>=0) arr.splice(pos,1); else if(!p.max || arr.length<p.max) arr.push(i); } p.opts.forEach((_,idx)=>{ const el=document.getElementById(`${pid}-${idx}`); if(el) el.classList.toggle('sel',(localVotes[pid]||[]).includes(idx));}); };
+window.submitVote=async function(pid){ const arr=localVotes[pid]||[]; if(arr.length===0) return; await set(root(`polls/${pid}/voters/${myId}`),{role:myRole||'facilitatore', votes:arr, at:serverTimestamp()}); document.getElementById('saved-'+pid)?.classList.add('show'); };
+function listenPoll(pid){
+  onValue(root(`polls/${pid}/voters`), snap=>{ const voters=snap.val()||{}; const p=POLLS[pid]; const counts=Array(p.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>{counts[i]=(counts[i]||0)+1;})); const total=Object.keys(voters).length || 0; p.opts.forEach((_,i)=>{ const el=document.getElementById(`${pid}-${i}`); if(!el) return; const pct=total?Math.round((counts[i]/total)*100):0; const score=(p.correct||[])[i] ?? 0; const bar=el.querySelector('.pbar'); bar.style.width=pct+'%'; bar.style.background=getScoreColor(score,pct); el.querySelector('.ppct').textContent=pct+'%'; el.querySelector('.pcnt').textContent=` ${counts[i]||0}`; }); });
 }
 
-function mkAnswer(qid, placeholder, saveFn) {
-  const saved = myAnswers[qid];
-  const saveHandler = saveFn ? `${saveFn}('${qid}')` : `saveAnswer('${qid}')`;
-  return '<textarea id="ta-'+qid+'" class="answer-area" placeholder="'+placeholder+'"' +
-    (saved?' readonly>'+saved:'>')+
-    '</textarea>' +
-    (!saved ? '<div style="margin-top:.5rem">' +
-      '<button class="save-btn" data-save="'+qid+'" onclick="'+saveHandler+'">Salva risposta</button>' +
-      '<span class="saved-ok" id="saved-'+qid+'">✓ Salvata</span></div>'
-      : '<p style="font-size:.75rem;color:var(--verde);margin-top:.35rem">✓ Risposta salvata</p>');
+async function renderReport(session){
+  const crisis=CRISES[session?.crisis||'governance'];
+  document.getElementById('content').innerHTML=`<div class="report"><h3>Report finale · Stop Doing List del tavolo</h3><p class="small mb"><strong>Crisi generata:</strong> ${esc(crisis.title)}</p><div id="report-stop"><p class="small">Caricamento risultati…</p></div><button class="report-btn" onclick="downloadReport()">Scarica report .txt</button></div>`;
+  const snap=await get(root('polls/stop/voters')); const voters=snap.val()||{}; const counts=Array(POLLS.stop.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++));
+  const top=counts.map((n,i)=>({n,i,t:POLLS.stop.opts[i]})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0).slice(0,5);
+  document.getElementById('report-stop').innerHTML=`<h3>Da domani smettiamo di:</h3><ul>${top.map(x=>`<li>${esc(x.t)} <span class="small">(${x.n} voti)</span></li>`).join('') || '<li>nessun voto registrato</li>'}</ul><h3 class="mt">Tavolo minimo da convocare prima dell’adozione</h3><ul><li>Direzione / governance</li><li>Responsabile del procedimento e ufficio utilizzatore</li><li>IT / RTD</li><li>DPO / privacy / compliance</li><li>RUP / DEC / acquisti</li><li>Ufficio legale, se il caso incide su atti o contenzioso</li><li>Docenti / commissioni, se impatta didattica, ammissioni o valutazione</li></ul>`;
 }
+window.downloadReport=async function(){ const s=(await get(root('session'))).val()||{}; const crisis=CRISES[s.crisis||'governance']; const snap=await get(root('polls/stop/voters')); const voters=snap.val()||{}; const counts=Array(POLLS.stop.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++)); const top=counts.map((n,i)=>({n,i,t:POLLS.stop.opts[i]})).sort((a,b)=>b.n-a.n).filter(x=>x.n>0); let txt=`AI Disaster Board - Modulo 4\nAvv.ta Adriana Augenti - Avvocata\n\nCRISI: ${crisis.title}\n${crisis.text}\n\nSTOP DOING LIST\n`; top.forEach((x,idx)=>txt+=`${idx+1}. ${x.t} (${x.n} voti)\n`); txt+='\nTAVOLO MINIMO\n- Direzione / governance\n- Responsabile procedimento e ufficio utilizzatore\n- IT / RTD\n- DPO / privacy / compliance\n- RUP / DEC / acquisti\n- Ufficio legale se rilevante\n- Docenti / commissioni se impatta didattica o valutazione\n'; const blob=new Blob([txt],{type:'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='AI_Disaster_Board_report.txt'; a.click(); URL.revokeObjectURL(a.href); };
 
-function renderF1() {
-  const fp = isFacilitatore ? facPanel(null, 1, "", "Fase 2: Momento della Verita") : "";
-  const facAns = isFacilitatore ?
-    '<div class="fac-panel" style="margin-top:1rem"><h3>Risposte in tempo reale</h3><div class="fac-answers-grid" id="fac-ans-f1"></div></div>' : "";
-  return fp +
-    '<div class="card rosso">' +
-    '<div class="eyebrow">Fase 1 · La Progettazione del Disastro</div>' +
-    '<h2 class="ctitle">Come progettiamo il peggior sistema AI possibile?</h2>' +
-    '<div class="cbody">Siete una task force incaricata di creare un sistema di intelligenza artificiale catastrofico per il vostro ente. Non ci sono limiti alla vostra creativita distruttiva.</div>' +
-    '</div>' +
-    '<div class="provocazione">' +
-    '<span class="emoji">💣</span>' +
-    "<p>\"Come possiamo usare l\'intelligenza artificiale per discriminare i docenti, violare palesemente la privacy e farci sanzionare pesantemente dal Garante o dall\'AgID?\"</p>" +
-    '</div>' +
-    '<div class="card ambra">' +
-    '<div class="eyebrow">Il vostro compito</div>' +
-    "<div class='cbody'>Elencate tutte le azioni e gli errori necessari per creare questo disastro. Siate spietati e creativi. Esempi per iniziare: inserire documenti riservati su ChatGPT, non controllare mai i documenti generati da strumenti AI, automatizzare decisioni senza supervisione umana...</div>" +
-    mkAnswer("f1", "Elencate qui tutte le azioni distruttive del vostro gruppo: piu siete creativi e spietati, meglio e...") +
-    '</div>' +
-    facAns;
+function listenProjector(){
+  onValue(root('session'), snap=>{ const s=snap.val(); if(!s) return; const phase=s.phase||0; document.getElementById('proj-phase-label').textContent='FASE '+(phase+1); document.getElementById('proj-phase-name').textContent=PHASES[phase]?.name||''; syncProjTimer(s,phase); });
 }
-
-function renderF2() {
-  const fp = isFacilitatore ? facPanel(0, 2, "Fase 1: Disastro", "Fase 3: Abbandono") : "";
-  const facAns = isFacilitatore ?
-    '<div class="fac-panel" style="margin-top:1rem"><h3>Risposte in tempo reale</h3><div class="fac-answers-grid" id="fac-ans-f2"></div></div>' : "";
-  return fp +
-    '<div class="card verde">' +
-    '<div class="eyebrow">Fase 2 · Il Momento della Verita</div>' +
-    '<h2 class="ctitle">Cosa di questo somiglia alla nostra realta lavorativa?</h2>' +
-    '<div class="cbody">Guardate la lista che avete scritto nella Fase 1. Questa e la domanda piu coraggiosa del laboratorio.</div>' +
-    '</div>' +
-    '<div class="provocazione" style="border-color:rgba(45,106,79,.3);background:rgba(45,106,79,.06)">' +
-    '<span class="emoji">🪞</span>' +
-    '<p style="color:var(--verde)">"Cosa di cio che abbiamo appena scritto somiglia a qualcosa che facciamo gia oggi nella nostra realta lavorativa?"</p>' +
-    '</div>' +
-    '<div class="card">' +
-    '<div class="eyebrow">Il vostro compito</div>' +
-    '<div class="cbody">Siate onesti. Non si tratta di accusare nessuno, ma di riconoscere le prassi rischiose gia presenti. Esempi tipici: uso di traduttori online gratuiti con documenti riservati, assenza di controlli su procedure automatizzate, condivisione di dati personali con strumenti non approvati...</div>' +
-    mkAnswer("f2", "Scrivete qui cosa della lista del disastro assomiglia alla vostra realta quotidiana...") +
-    '</div>' +
-    facAns;
+function syncProjTimer(s,phase){
+  clearInterval(projTimerInterval); const total=s.timerTotal||120,end=s.timerEnd||now(),paused=s.timerPaused,pausedAt=s.timerPausedAt; const el=document.getElementById('proj-timer'); const results=document.getElementById('proj-results'); const help=document.getElementById('proj-help');
+  function upd(){ let rem=paused&&pausedAt?Math.max(0,Math.round((end-pausedAt)/1000)):Math.max(0,Math.round((end-now())/1000)); const m=Math.floor(rem/60), sec=rem%60; el.textContent=`${m}:${String(sec).padStart(2,'0')}`; el.classList.toggle('urgent',rem<=45&&rem>0); if(rem===0){clearInterval(projTimerInterval); help.style.display='none'; results.style.display='block'; showProjectorResults(phase,s);} else {help.style.display='block'; results.style.display='none';}}
+  upd(); if(!paused) projTimerInterval=setInterval(upd,500);
 }
+async function showProjectorResults(phase,s){ const results=document.getElementById('proj-results'); results.innerHTML=''; if(phase===1){ const snap=await get(root('choices')); const val=snap.val()||{}; const counts={}; Object.values(val).forEach(v=>(v.cats||[]).forEach(c=>counts[c]=(counts[c]||0)+1)); const entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]); const total=Math.max(1,...entries.map(e=>e[1])); results.innerHTML=`<div class="proj-help">Categorie disastro più votate</div>`+entries.map(([k,n])=>`<div class="proj-opt"><div class="proj-bar" style="width:${Math.round(n/total*100)}%;background:rgba(201,125,46,.45)"></div><div class="proj-oc"><span class="proj-label">#${esc(k)}</span><span class="proj-pct">${n}</span></div></div>`).join(''); return; }
+  if(phase===2){ const c=CRISES[s.crisis||'governance']; results.innerHTML=`<div class="proj-help"><strong>${esc(c.title)}</strong><br>${esc(c.text)}</div>`; await showPollProj('blame',results); return; }
+  if(phase===3){ await showPollProj('silo',results); return; }
+  if(phase===4 || phase===5){ await showPollProj('stop',results); return; }
+  results.innerHTML='<div class="proj-help">Il tavolo di governance è convocato. Purtroppo.</div>'; }
+async function showPollProj(pid,container){ const p=POLLS[pid]; const snap=await get(root(`polls/${pid}/voters`)); const voters=snap.val()||{}; const counts=Array(p.opts.length).fill(0); Object.values(voters).forEach(v=>(v.votes||[]).forEach(i=>counts[i]++)); const total=Object.keys(voters).length||0; container.innerHTML += `<div class="proj-help">${esc(p.q)}</div>` + p.opts.map((o,i)=>{ const pct=total?Math.round(counts[i]/total*100):0; const score=(p.correct||[])[i]??1; return `<div class="proj-opt"><div class="proj-bar" style="width:${pct}%;background:${getScoreColor(score,pct)}"></div><div class="proj-oc"><span class="proj-label">${esc(o)}</span><span class="proj-pct">${pct}%</span></div></div>`; }).join(''); }
 
-function renderF3() {
-  const fp = isFacilitatore ? facPanel(1, null, "Fase 2: Verita", "") : "";
-  return fp +
-    '<div class="card rosso">' +
-    '<div class="eyebrow">Fase 3 · La Distruzione Creativa</div>' +
-    '<h2 class="ctitle">Cosa dobbiamo smettere di fare subito?</h2>' +
-    '<div class="cbody">Il vostro compito finale non e aggiungere nuove procedure, ma eliminare quelle dannose. Ogni gruppo propone il comportamento piu urgente da abbandonare. Poi votate tutti insieme.</div>' +
-    '</div>' +
-    '<div class="provocazione" style="border-color:rgba(201,125,46,.3);background:rgba(201,125,46,.06)">' +
-    '<span class="emoji">🗑</span>' +
-    '<p style="color:var(--ambra)">"Cosa dobbiamo smettere di fare per aprire lo spazio alla vera innovazione?"</p>' +
-    '</div>' +
-    '<div class="card ambra">' +
-    '<div class="eyebrow">Passo 1 · La proposta del vostro gruppo</div>' +
-    '<div class="cbody">Scegliete il comportamento piu urgente da eliminare tra quelli emersi nella Fase 2 e scrivetelo qui. Usate una sola frase chiara e concreta.</div>' +
-    '<textarea id="ta-f3" class="answer-area" placeholder="Es: Smettere di caricare documenti riservati su strumenti AI gratuiti non approvati" style="min-height:80px">' +
-    (myAnswers["f3"]||"") + '</textarea>' +
-    (!myAnswers["f3"]?'<div style="margin-top:.5rem">' +
-      '<button class="save-btn" id="btn-f3" onclick="submitElimina()">Proponi al gruppo</button>' +
-      '<span class="saved-ok" id="saved-f3">✓ Proposta inviata</span>' +
-      '</div>':'<p style="font-size:.75rem;color:var(--verde);margin-top:.35rem">✓ Proposta inviata</p>') +
-    '</div>' +
-    '<div class="card">' +
-    '<div class="eyebrow">Passo 2 · Votate cosa eliminare</div>' +
-    '<div class="cbody" style="margin-bottom:.75rem">Leggete le proposte di tutti i gruppi e votate quelle che ritenete piu urgenti. Potete votare piu proposte.</div>' +
-    '<ul class="elimina-list" id="elimina-container"></ul>' +
-    '</div>';
-}
-
-// INIT
-renderPhase(0);
-if (isFacilitatore) { listenToAllAnswers(); listenToElimina(); }
-
-window._ready({
-  selectGroup, joinSession, goToPhase, timerToggle, timerReset,
-  sendKangaro, clearKangaro, saveAnswer, submitElimina,
-  resetSessione, downloadReport
-});
 </script>
 </body>
 </html>
