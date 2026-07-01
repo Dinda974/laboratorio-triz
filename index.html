@@ -1333,13 +1333,14 @@ function syncTimer(timerEnd, timerTotal, paused, pausedAt) {
     const circ = document.getElementById("timer-circle");
     if (circ) {
       circ.style.strokeDashoffset = timerTotal > 0 ? CIRC * (1 - rem / timerTotal) : 0;
-      circ.className = "timer-fill" + (rem <= 60 && rem > 0 ? " urgent" : "");
+      circ.setAttribute("class", "timer-fill" + (rem <= 60 && rem > 0 ? " urgent" : ""));
     }
     // Proiettore timer
     const projT = document.getElementById("proj-timer");
     if (projT) {
       projT.textContent = timerEnd === 0 ? "--:--" : txt;
       projT.className = "proj-timer" + (rem <= 60 && rem > 0 ? " urgent" : "");
+      projT.style.display = timerEnd > 0 ? "block" : "none";
     }
   }
   update();
@@ -1878,7 +1879,7 @@ function renderPollResults(kind, opts, showVoters) {
 function renderProjector(sessionData, fullData) {
   const phase = sessionData?.phase || 0;
   const pl = document.getElementById("proj-phase-label");
-  const pt = document.getElementById("proj-phase-title");
+  const pt = document.getElementById("proj-phase-title"); 
   const ps = document.getElementById("proj-sub");
   const dyn = document.getElementById("proj-dynamic");
   if (pl) pl.textContent = "FASE " + (phase + 1);
