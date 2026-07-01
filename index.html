@@ -1256,6 +1256,7 @@ function startProjector() {
   document.getElementById("screen-landing").classList.remove("active");
   document.getElementById("screen-proj").style.display = "flex";
   document.getElementById("screen-proj").style.flexDirection = "column";
+  renderProjector({ phase: 0 });
   listenAll();
 }
 
