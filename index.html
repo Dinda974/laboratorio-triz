@@ -1167,16 +1167,6 @@ const BLAME_OPTS = [
   { t: "Non è colpa di nessuno: l'AI è nuova, gli errori sono inevitabili.", score: 0, why: "Pericolosa: normalizza l'assenza di governance." }
 ];
 
-const SILOS_OPTS = [
-  { t: "Direzione senza governance: urgenza, fondi e reputazione prima dei presidi.", score: 0.75 },
-  { t: "Acquisti senza requisiti: contratto funzionale ma non ispezionabile.", score: 0.75 },
-  { t: "Tecnologia senza procedimento: sicurezza tecnica senza impatto amministrativo.", score: 0.75 },
-  { t: "Privacy e compliance coinvolte troppo tardi.", score: 0.75 },
-  { t: "Didattica e commissioni fuori dal perimetro comune.", score: 0.75 },
-  { t: "Tutti i precedenti: nessun tavolo unico, nessuna responsabilità ricomposta.", score: 1 },
-  { t: "Nessun silos: basta una circolare della Direzione.", score: 0 }
-];
-
 const STOP_OPTS = [
   { t: "Smettere di usare strumenti AI non autorizzati con dati reali.", score: 1 },
   { t: "Smettere di acquistare AI senza requisiti su log, audit, dati e aggiornamenti.", score: 1 },
@@ -1339,12 +1329,12 @@ function syncTimer(timerEnd, timerTotal, paused, pausedAt) {
     const projT = document.getElementById("proj-timer");
     if (projT) {
       projT.textContent = timerEnd === 0 ? "--:--" : txt;
-      projT.className = "proj-timer" + (rem <= 60 && rem > 0 ? " urgent" : "");
-      projT.style.display = timerEnd > 0 ? "block" : "none";
+      projT.className = "proj-timer" + (rem <= 60 && rem > 0 && !paused ? " urgent" : "");
+      projT.style.display = (timerEnd > 0 && !paused) ? "block" : "none";
     }
   }
   update();
-  if (!paused && timerEnd > 0) timerInterval = setInterval(update, 500);
+  if (timerEnd > 0) timerInterval = setInterval(update, 500);
 }
 
 window.goToPhase = async function(phase) {
@@ -1366,10 +1356,10 @@ window.timerToggle = async function() {
   const data = snap.val() || {};
   const isPaused = data.timerPaused || false;
   if (isPaused) {
-    const rem = Math.max(0, Math.round((data.timerEnd - (data.timerPausedAt || Date.now())) / 1000));
+    const elapsedOnPause = Date.now() - (data.timerPausedAt || Date.now());
     await set(ref(db, "session/timerPaused"), false);
     await set(ref(db, "session/timerPausedAt"), null);
-    await set(ref(db, "session/timerEnd"), Date.now() + rem * 1000);
+    await set(ref(db, "session/timerEnd"), data.timerEnd + elapsedOnPause);
   } else {
     await set(ref(db, "session/timerPaused"), true);
     await set(ref(db, "session/timerPausedAt"), Date.now());
@@ -1456,6 +1446,14 @@ window.savePoll = async function(kind, idx, multi) {
   renderPhase(currentPhase);
 };
 
+window.saveSilosAnalysis = async function() {
+  const text = document.getElementById("silos-analysis-text")?.value;
+  if (!text || text.trim() === "") { alert("Scrivi un'analisi prima di inviare."); return; }
+  const myId = localStorage.getItem("disasterGroupMyId");
+  if (!myId) return;
+  await set(ref(db, "groups/" + myId + "/silos_analysis"), text);
+  renderPhase(currentPhase);
+}
 // ── KANGARO ──
 window.sendKangaro = async function() {
   if (isFac) return;
@@ -1529,12 +1527,12 @@ window.downloadPDF = async function() {
   // Voti poll
   const polls = all.polls || {};
   const pollDefs = [
-    { key: "blame", label: "Di chi è la colpa?", opts: BLAME_OPTS, voters: all.poll_voters?.blame || {} },
-    { key: "silos", label: "Quale silos ha creato il disastro?", opts: SILOS_OPTS, voters: all.poll_voters?.silos || {} },
+    { key: "blame", label: "Di chi è la colpa?", opts: BLAME_OPTS, voters: all.poll_voters?.blame || {} },    
     { key: "stop",  label: "Stop Doing List", opts: STOP_OPTS, voters: all.poll_voters?.stop || {} }
   ];
   pollDefs.forEach(pd => {
     heading(pd.label, 13, BLU);
+    if (!polls[pd.key]) { body("Nessun voto registrato per questa fase.", 9, GRIGIO); y += 2; return; }
     const votes = polls[pd.key] || {};
     const total = Object.values(votes).reduce((a,b) => a + b, 0);
     pd.opts.forEach((o, i) => {
@@ -1551,6 +1549,15 @@ window.downloadPDF = async function() {
       if (o.why) { doc.setFont("helvetica","italic").setFontSize(8).setTextColor(...GRIGIO); const wl = doc.splitTextToSize("   " + o.why, 174); wl.forEach(l => { checkY(5); doc.text(l,14,y); y+=4.5; }); }
     });
     y += 3;
+  });
+  
+  // Analisi Silos
+  heading("Analisi sui Silos Organizzativi", 13, BLU);
+  Object.values(all.groups || {}).forEach(g => {
+    if (g.silos_analysis) {
+      heading(ROLES[g.role]?.name || g.role, 10, AMBRA);
+      body(g.silos_analysis, 9, [55,65,81]);
+    }
   });
 
   heading("Nota Metodologica", 11, GRIGIO);
@@ -1575,7 +1582,7 @@ function renderPhase(phase) {
     case 1: main.innerHTML = renderDisastro(); attachDisasterHandlers(); break;
     case 2: main.innerHTML = renderCrisi(); break;
     case 3: main.innerHTML = renderBlame(); attachPollHandlers("blame", false, true); listenPoll("blame", true); break;
-    case 4: main.innerHTML = renderSilos(); attachPollHandlers("silos", false, false); listenPoll("silos", false); break;
+    case 4: main.innerHTML = renderSilos(); break;
     case 5: main.innerHTML = renderStop(); attachPollHandlers("stop", true, false); listenPoll("stop", false); break;
     case 6: main.innerHTML = renderReport(); break;
   }
@@ -1607,7 +1614,7 @@ function refreshGroupsInFac() {
       const choices = sel.map(i => mosse[i]?.t || "").filter(Boolean).join(" · ") || "nessuna scelta ancora";
       const voteInfo = [];
       if (g.voteBlame !== undefined) voteInfo.push("Colpa: " + (BLAME_OPTS[g.voteBlame]?.t?.slice(0,40) || ""));
-      if (g.voteSilos !== undefined) voteInfo.push("Silos: " + (SILOS_OPTS[g.voteSilos]?.t?.slice(0,40) || ""));
+      if (g.silos_analysis) voteInfo.push("Analisi Silos: " + g.silos_analysis.slice(0,40) + "...");
       container.innerHTML += `<div class="fac-group-card">
         <div class="fac-group-name">${g.name || id}</div>
         <div class="fac-group-role">${ROLES[g.role]?.name || g.role}</div>
@@ -1732,21 +1739,18 @@ function renderBlame() {
 }
 
 function renderSilos() {
-  const done = myVotes["silos"] !== undefined || isFac;
+  const myId = localStorage.getItem("disasterGroupMyId");
+  const myGroupData = groups[myId] || {};
+  const done = myGroupData.silos_analysis || isFac;
+
   return facPanel(3, 5, "Litighiamo", "Stop List") + `
     <div class="card">
       <div class="eyebrow">Fase 5 · Basta Silos</div>
       <h2 class="ctitle">Quale silos ha creato il disastro?</h2>
-      <div class="cbody">Ora smettiamo di difenderci. Dov'è il difetto organizzativo vero? I risultati saranno visibili solo a fine fase (o quando la facilitatrice li mostrerà).</div>
-      <div class="popts ${done ? "" : "poll-hidden"}" id="poll-silos">
-        ${SILOS_OPTS.map((o, i) => `
-          <div class="popt ${myVotes["silos"] === i ? "sel" : ""} ${done ? "locked" : ""}" data-poll="silos" data-i="${i}">
-            <div class="pbar"></div>
-            <div class="poc"><span class="plabel">${o.t}</span><span class="ppct">—</span></div>
-            <div class="pvoters"></div>
-          </div>`).join("")}
-      </div>
-      ${!done && !isFac ? `<button class="nbtn" style="margin-top:.75rem" onclick="confirmPoll('silos', false)">Conferma risposta</button>
+      <div class="cbody">Ora smettiamo di difenderci. Scrivete in un breve testo qual è, secondo voi, il difetto organizzativo vero che ha portato alla crisi. La vostra analisi sarà inclusa nel report finale.</div>
+      ${!done && !isFac ? `
+        <textarea id="silos-analysis-text" rows="4" style="width:100%;margin-top:1rem;padding:.5rem;border-radius:8px;border:1px solid var(--gc);font-family:inherit;font-size:.9rem" placeholder="Scrivi qui la tua analisi..."></textarea>
+        <button class="nbtn" style="margin-top:.75rem" onclick="saveSilosAnalysis()">Invia analisi</button>
         ` : ""}
       ${done ? `<div class="locked-note">✓ Voto acquisito.</div>` : ""}
     </div>`;
@@ -1834,7 +1838,7 @@ window.confirmPoll = async function(kind, multi) {
 
 function listenPoll(kind, showVoters) {
   onValue(ref(db, "polls/" + kind), snap => {
-    const votes = snap.val() || {};
+    const votes = snap.val() || {};    
     const total = Object.values(votes).reduce((a,b) => a+b, 0);
     const opts = kind === "blame" ? BLAME_OPTS : kind === "silos" ? SILOS_OPTS : STOP_OPTS;
     document.querySelectorAll(`[data-poll="${kind}"]`).forEach(el => {
@@ -2636,8 +2640,7 @@ function renderProjector(sessionData, fullData) {
   } else if (phase === 4) {
     // Silos — nascosto fino a stop timer
     const show = (fullData.timerEnd > 0 && Date.now() > fullData.timerEnd) || fullData.showResults;
-    dyn.innerHTML = show ? `<div class="proj-results" id="proj-silos"></div>` : `<div style="font-size:1.2rem;color:rgba(248,246,241,.7);margin-top:1rem">I gruppi stanno votando...</div>`;
-    listenProjPoll("silos", SILOS_OPTS, false);
+    dyn.innerHTML = `<div style="font-size:1.2rem;color:rgba(248,246,241,.7);margin-top:1rem">I gruppi stanno scrivendo le loro analisi...</div>`;
   } else if (phase === 5) {
     // Stop — nascosto
     const show = (fullData.timerEnd > 0 && Date.now() > fullData.timerEnd) || fullData.showResults;
@@ -2698,7 +2701,7 @@ function listenProjPoll(kind, opts, showVoters) {
 // ── INIT ──
 window._ready({
   selectRole, joinSession, goToPhase, timerToggle, timerReset,
-  sendKangaro, clearKangaro, saveDisaster, savePoll, resetLab, downloadPDF, stopAndShow,
+  sendKangaro, clearKangaro, saveDisaster, savePoll, resetLab, downloadPDF, stopAndShow, saveSilosAnalysis,
   confirmPoll: window.confirmPoll
 });
 </script>
